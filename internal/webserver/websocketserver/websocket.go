@@ -9,19 +9,19 @@ import (
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	wac "github.com/ski7777/gomultiwa/internal/waclient"
+	"github.com/ski7777/gomultiwa/internal/gomultiwa"
 )
 
 type WSServer struct {
 	server   *http.Server
-	wa       *wac.WAClient
+	wa       *gomultiwa.GoMultiWA
 	upgrader *websocket.Upgrader
 	router   *mux.Router
 }
 
 type WSServerConfig struct {
 	HTTPServerConfig
-	WA *wac.WAClient
+	WA *gomultiwa.GoMultiWA
 }
 
 func NewWSServer(config *WSServerConfig) *WSServer {
