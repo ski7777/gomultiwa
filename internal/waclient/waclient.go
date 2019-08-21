@@ -1,11 +1,6 @@
 package waclient
 
 import (
-	"encoding/gob"
-	"fmt"
-	"os"
-	"time"
-
 	wa "github.com/Rhymen/go-whatsapp"
 )
 
@@ -26,4 +21,3 @@ func NewWAClient(session *wa.Session) (*WAClient, error) {
 	}
 	return gmw, err
 }
-
