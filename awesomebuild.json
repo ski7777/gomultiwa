@@ -1,0 +1,61 @@
+{
+    "main": "build",
+    "project": "gomultiwa",
+    "rules": {
+        "build": {
+            "cmd": [
+                {
+                    "rule": "prepare-output",
+                    "type": "rule"
+                },
+                {
+                    "cmd": "packr build -o output/gomultiwa cmd/gomultiwa/main.go",
+                    "type": "cmd"
+                }
+            ],
+            "trigger": {
+                "subtype": "changed",
+                "type": "directory",
+                "value": "internal"
+            }
+        },
+        "get-dependencies": {
+            "cmd": [
+                {
+                    "cmd": "GO111MODULE=on go mod tidy",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "rm -rf vendor",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "GO111MODULE=on go mod vendor",
+                    "type": "cmd"
+                }
+            ],
+            "trigger": {
+                "subtype": "changed",
+                "type": "directory",
+                "value": "internal"
+            }
+        },
+        "prepare-output": {
+            "cmd": [
+                {
+                    "rule": "get-dependencies",
+                    "type": "rule"
+                },
+                {
+                    "cmd": "mkdir output",
+                    "type": "cmd"
+                }
+            ],
+            "trigger": {
+                "subtype": "not exist",
+                "type": "directory",
+                "value": "output"
+            }
+        }
+    }
+}
