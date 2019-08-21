@@ -13,11 +13,18 @@
                     "type": "cmd"
                 }
             ],
-            "trigger": {
-                "subtype": "changed",
-                "type": "directory",
-                "value": "internal"
-            }
+            "trigger": [
+                {
+                    "subtype": "changed",
+                    "type": "directory",
+                    "value": "internal"
+                },
+                {
+                    "subtype": "not exist",
+                    "type": "file",
+                    "value": "output/gomultiwa"
+                }
+            ]
         },
         "get-dependencies": {
             "cmd": [
