@@ -3,11 +3,11 @@
     "project": "gomultiwa",
     "rules": {
         "build": {
+            "callBefore": [
+                "prepare-output",
+                "get-dependencies"
+            ],
             "cmd": [
-                {
-                    "rule": "prepare-output",
-                    "type": "rule"
-                },
                 {
                     "cmd": "packr build -o output/gomultiwa cmd/gomultiwa/main.go",
                     "type": "cmd"
@@ -49,10 +49,6 @@
         },
         "prepare-output": {
             "cmd": [
-                {
-                    "rule": "get-dependencies",
-                    "type": "rule"
-                },
                 {
                     "cmd": "mkdir output",
                     "type": "cmd"
