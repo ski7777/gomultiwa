@@ -17,14 +17,18 @@ type ConfigData struct {
 
 func NewConfig(path string) (*Config, error) {
 	var config = new(Config)
-	fi, err := os.Stat(path)
+	config.path = path
+	fi, err := os.Stat(config.path)
 	if err != nil {
-		return nil, err
+		config.init()
+		if err := config.Save(); err != nil {
+			return nil, err
+		}
+		return config, nil
 	}
 	if !fi.Mode().IsRegular() {
-		return nil, fmt.Errorf("NotADirectoryError: %s is not a valid file", path)
+		return nil, fmt.Errorf("NotADirectoryError: %s is not a valid file", config.path)
 	}
-	config.path = path
 	if err := config.load(); err != nil {
 		return nil, err
 	}
@@ -43,7 +47,7 @@ func (c *Config) load() error {
 }
 
 func (c *Config) Save() error {
-	datajson, err := json.Marshal(c.data)
+	datajson, err := json.MarshalIndent(c.data, "", "	")
 	if err != nil {
 		return err
 	}
@@ -52,4 +56,8 @@ func (c *Config) Save() error {
 		return err
 	}
 	return nil
+}
+
+func (c *Config) init() {
+	//build config from scratch here...
 }
