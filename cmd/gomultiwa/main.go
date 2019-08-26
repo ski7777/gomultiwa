@@ -21,5 +21,10 @@ func main() {
 		log.Fatal(err)
 	}
 	gmw.Start()
+	for _, c := range gmw.GetClients().Clients {
+		if err := c.Connect(); err != nil {
+			log.Fatal(err)
+		}
+	}
 	<-make(chan int, 1)
 }

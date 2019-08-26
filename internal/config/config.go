@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/ski7777/gomultiwa/internal/waclient"
 )
 
 type Config struct {
 	path string
-	data ConfigData
+	Data ConfigData
 }
 
 type ConfigData struct {
+	WAClients  *waclient.WAClients `json:"clients"`
 }
 
 func NewConfig(path string) (*Config, error) {
@@ -42,12 +45,21 @@ func (c *Config) load() error {
 	}
 	defer file.Close()
 	byteValue, _ := ioutil.ReadAll(file)
-	json.Unmarshal(byteValue, &c.data)
+	json.Unmarshal(byteValue, &c.Data)
+	if c.Data.WAClients.Clients == nil {
+		c.Data.WAClients.Clients = make(map[string]*waclient.WAClientConfig)
+	}
+	for k := range c.Data.WAClients.Clients {
+		c.Data.WAClients.Clients[k].ImportSession()
+	}
 	return nil
 }
 
 func (c *Config) Save() error {
-	datajson, err := json.MarshalIndent(c.data, "", "	")
+	for k := range c.Data.WAClients.Clients {
+		c.Data.WAClients.Clients[k].ExportSession()
+	}
+	datajson, err := json.MarshalIndent(c.Data, "", "	")
 	if err != nil {
 		return err
 	}
