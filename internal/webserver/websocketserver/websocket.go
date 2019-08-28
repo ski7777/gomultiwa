@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
+	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/calls"
 )
 
 type WSServer struct {
@@ -37,6 +38,7 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	var staticbox = packr.New(staticdir, staticdir)
 	registerStaticFile(s.router, webbox, "index.html")
 	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
+	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
 	s.server = &http.Server{
 		Addr:         config.GetAddr(),
 		WriteTimeout: time.Second * 15,
@@ -66,6 +68,8 @@ func registerStaticFile(router *mux.Router, box *packr.Box, name string) {
 
 func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Request) {
 	switch call {
+	case "sendmsg":
+		return calls.SendMsg(ws.wa)
 	default:
 		log.Fatal(errors.New("API NOT FOUND"))
 	}
