@@ -15,15 +15,14 @@ func main() {
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
+		return
 	}
+	log.Println("Starting up...")
 	gmw, err := gomultiwa.NewGoMultiWA(*configpath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	gmw.Start()
-	for _, c := range gmw.GetClients().Clients {
-
-		}
-	}
+	log.Println("Ready")
 	<-make(chan int, 1)
 }
