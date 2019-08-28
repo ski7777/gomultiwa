@@ -9,19 +9,19 @@ import (
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/ski7777/gomultiwa/internal/gomultiwa"
+	"github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
 )
 
 type WSServer struct {
 	server   *http.Server
-	wa       *gomultiwa.GoMultiWA
+	wa       gmwi.GoMultiWAInterface
 	upgrader *websocket.Upgrader
 	router   *mux.Router
 }
 
 type WSServerConfig struct {
 	HTTPServerConfig
-	WA *gomultiwa.GoMultiWA
+	WA gmwi.GoMultiWAInterface
 }
 
 func NewWSServer(config *WSServerConfig) *WSServer {
@@ -61,4 +61,3 @@ func registerStaticFile(router *mux.Router, box *packr.Box, name string) {
 		}
 	})
 }
-
