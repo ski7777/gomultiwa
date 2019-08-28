@@ -1,6 +1,8 @@
 package websocketserver
 
 import (
+	"errors"
+	"log"
 	"net/http"
 	"path"
 	"runtime"
@@ -60,4 +62,12 @@ func registerStaticFile(router *mux.Router, box *packr.Box, name string) {
 			w.Write(data)
 		}
 	})
+}
+
+func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Request) {
+	switch call {
+	default:
+		log.Fatal(errors.New("API NOT FOUND"))
+	}
+	return nil
 }
