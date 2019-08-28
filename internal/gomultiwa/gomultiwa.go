@@ -1,6 +1,8 @@
 package gomultiwa
 
 import (
+	"time"
+
 	"github.com/ski7777/gomultiwa/internal/config"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
 	"github.com/ski7777/gomultiwa/internal/waclient"
@@ -8,10 +10,12 @@ import (
 )
 
 type GoMultiWA struct {
-	config     *config.Config
-	wsc        *websocketserver.WSServerConfig
-	ws         *websocketserver.WSServer
-	handlerhub *handlerhub.HandlerHub
+	config            *config.Config
+	wsc               *websocketserver.WSServerConfig
+	ws                *websocketserver.WSServer
+	handlerhub        *handlerhub.HandlerHub
+	stopsavethread    bool
+	savethreadstopped bool
 }
 
 func (g *GoMultiWA) Start() error {
@@ -27,6 +31,13 @@ func (g *GoMultiWA) Start() error {
 		return err
 	}
 	go g.ws.Start()
+	go func() {
+		for g.stopsavethread {
+			g.config.Save()
+			time.Sleep(5 * time.Second)
+		}
+		g.savethreadstopped = true
+	}()
 	return nil
 }
 
