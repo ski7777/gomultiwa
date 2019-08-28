@@ -2,13 +2,16 @@ package waclient
 
 import (
 	whatsapp "github.com/Rhymen/go-whatsapp"
-	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
 )
 
 type WAHandler struct {
-	id *uuid.UUID
+	id string
 	hh *handlerhub.HandlerHub
+}
+
+func (wah *WAHandler) SetID(id string) {
+	wah.id = id
 }
 
 func (wah *WAHandler) HandleError(err error) {
