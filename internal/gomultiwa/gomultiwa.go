@@ -9,12 +9,23 @@ type GoMultiWA struct {
 	config *config.Config
 }
 
-func (g *GoMultiWA) Start() {
+func (g *GoMultiWA) Start() error {
+	for k := range g.config.Data.WAClients.Clients {
+		if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
+			return err
+		}
+		g.config.Data.WAClients.Clients[k].WAClient.WA.AddHandler(handler)
+	}
+	if err := g.config.Save(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GoMultiWA) GetClients() *waclient.WAClients {
 	return g.config.Data.WAClients
 }
+
 func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	var gmw = new(GoMultiWA)
 	var err error
@@ -22,11 +33,5 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	if err != nil {
 		return nil, err
 	}
-	for k := range gmw.config.Data.WAClients.Clients {
-		if err := gmw.config.Data.WAClients.Clients[k].Connect(); err != nil {
-			return nil, err
-		}
-	}
-	gmw.config.Save()
 	return gmw, nil
 }
