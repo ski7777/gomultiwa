@@ -2,15 +2,19 @@ package gomultiwa
 
 import (
 	"github.com/ski7777/gomultiwa/internal/config"
+	"github.com/ski7777/gomultiwa/internal/handlerhub"
 	"github.com/ski7777/gomultiwa/internal/waclient"
 )
 
 type GoMultiWA struct {
 	config *config.Config
+	handlerhub *handlerhub.HandlerHub
 }
 
 func (g *GoMultiWA) Start() error {
 	for k := range g.config.Data.WAClients.Clients {
+		handler := new(waclient.WAHandler)
+		handler.SetID(k)
 		if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
 			return err
 		}
@@ -33,5 +37,6 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	if err != nil {
 		return nil, err
 	}
+	gmw.handlerhub = new(handlerhub.HandlerHub)
 	return gmw, nil
 }
