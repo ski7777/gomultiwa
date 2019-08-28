@@ -4,10 +4,13 @@ import (
 	"github.com/ski7777/gomultiwa/internal/config"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
 	"github.com/ski7777/gomultiwa/internal/waclient"
+	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver"
 )
 
 type GoMultiWA struct {
-	config *config.Config
+	config     *config.Config
+	wsc        *websocketserver.WSServerConfig
+	ws         *websocketserver.WSServer
 	handlerhub *handlerhub.HandlerHub
 }
 
@@ -23,6 +26,7 @@ func (g *GoMultiWA) Start() error {
 	if err := g.config.Save(); err != nil {
 		return err
 	}
+	go g.ws.Start()
 	return nil
 }
 
@@ -38,5 +42,10 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 		return nil, err
 	}
 	gmw.handlerhub = new(handlerhub.HandlerHub)
+	gmw.wsc = new(websocketserver.WSServerConfig)
+	gmw.wsc.Host = "0.0.0.0"
+	gmw.wsc.Port = 8888
+	gmw.wsc.WA = gmw
+	gmw.ws = websocketserver.NewWSServer(gmw.wsc)
 	return gmw, nil
 }
