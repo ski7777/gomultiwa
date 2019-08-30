@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/ski7777/gomultiwa/internal/user"
 	"github.com/ski7777/gomultiwa/internal/waclient"
 )
 
@@ -15,6 +16,7 @@ type Config struct {
 }
 
 type ConfigData struct {
+	Userconfig *[]*user.User       `json:"users"`
 	WAClients  *waclient.WAClients `json:"clients"`
 }
 

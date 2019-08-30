@@ -1,7 +1,8 @@
 package user
 
 type User struct {
-	clients []string
+	Clients     []string        `json:"clients"`
+	Permissions []UserPermisson `json:"permissions"`
 }
 
 const (
@@ -10,11 +11,13 @@ const (
 )
 
 type UserPermisson struct {
-	cleint               string
-	whitelist, blacklist []Permission
-	mode                 int
+	Cleint    string       `json:"client"`
+	Whitelist []Permission `json:"whitelist"`
+	Blacklist []Permission `json:"blacklist"`
+	Mode      int          `json:"mode"`
 }
 
 type Permission struct {
-	remote string
+	Remote string `json:"remote"`
+	Jids   string `json:"jids"`
 }
