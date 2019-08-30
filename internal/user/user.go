@@ -3,6 +3,7 @@ package user
 type User struct {
 	Clients     []string        `json:"clients"`
 	Permissions []UserPermisson `json:"permissions"`
+	Admin       bool            `json:"admin"`
 }
 
 const (
