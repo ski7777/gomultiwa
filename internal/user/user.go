@@ -1,11 +1,7 @@
 package user
 
-import (
-	wac "github.com/ski7777/gomultiwa/internal/waclient"
-)
-
 type User struct {
-	clients []wac.WAClient
+	clients []string
 }
 
 const (
@@ -14,7 +10,7 @@ const (
 )
 
 type UserPermisson struct {
-	cleint               wac.WAClient
+	cleint               string
 	whitelist, blacklist []Permission
 	mode                 int
 }
