@@ -11,7 +11,7 @@ func ResponseWriter(w http.ResponseWriter, code int, err error, payload interfac
 	if err != nil {
 		payload = structs.NewError(err)
 	}
-	data, e := json.MarshalIndent(payload, "", "")
+	data, e := json.Marshal(payload)
 	if e != nil {
 		ResponseWriter(w, 500, e, "")
 	} else {
