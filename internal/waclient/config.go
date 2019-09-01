@@ -48,7 +48,7 @@ func newJsonSession(s *wa.Session) *JSONSession {
 	return &JSONSession{s.ClientId, s.ClientToken, s.ServerToken, s.EncKey, s.MacKey, s.Wid}
 }
 
-func newWAClientConfig(s *wa.Session) *WAClientConfig {
+func NewWAClientConfig(s *wa.Session) *WAClientConfig {
 	c := new(WAClientConfig)
 	c.session = s
 	return c
