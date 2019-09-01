@@ -13,7 +13,10 @@ import (
 func RegisterClient(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req = new(structs.RegisterClientReq)
-		util.RequestLoader(w, r, req)
+		if err := util.RequestLoader(w, r, req); err != nil {
+			util.ResponseWriter(w, 400, err, nil)
+			return
+		}
 		qr, id, err := wa.StartRegistration("")
 		if err != nil {
 			util.ResponseWriter(w, 500, err, nil)

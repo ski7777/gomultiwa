@@ -12,9 +12,12 @@ import (
 
 func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var sendmsg = new(structs.SendmsgReq)
-		util.RequestLoader(w, r, sendmsg)
-		wacc, ok := wa.GetClients().Clients[sendmsg.ID]
+		var req = new(structs.SendmsgReq)
+		if err := util.RequestLoader(w, r, req); err != nil {
+			util.ResponseWriter(w, 400, err, nil)
+			return
+		}
+		wacc, ok := wa.GetClients().Clients[req.ID]
 		if !ok {
 			util.ResponseWriter(w, 404, errors.New("WA Client ID not found!"), nil)
 			return
@@ -22,9 +25,9 @@ func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 		wac := wacc.WAClient.WA
 		if _, err := wac.Send(whatsapp.TextMessage{
 			Info: whatsapp.MessageInfo{
-				RemoteJid: sendmsg.JID,
+				RemoteJid: req.JID,
 			},
-			Text: sendmsg.MSG,
+			Text: req.MSG,
 		}); err != nil {
 			util.ResponseWriter(w, 500, err, nil)
 			return
