@@ -1,12 +1,12 @@
 package structs
 
-type OK struct {
+type OKRes struct {
 	Status  string      `json:"status"`
 	Payload interface{} `json:"payload"`
 }
 
-func NewOK(p interface{}) *OK {
-	es := new(OK)
+func NewOKRes(p interface{}) *OKRes {
+	es := new(OKRes)
 	es.Status = "OK"
 	es.Payload = p
 	return es

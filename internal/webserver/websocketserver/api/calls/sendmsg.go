@@ -12,7 +12,7 @@ import (
 
 func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var sendmsg = new(structs.Sendmsg)
+		var sendmsg = new(structs.SendmsgReq)
 		util.RequestLoader(w, r, sendmsg)
 		wacc, ok := wa.GetClients().Clients[sendmsg.ID]
 		if !ok {
@@ -29,6 +29,6 @@ func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 			util.ResponseWriter(w, 500, err, nil)
 			return
 		}
-		util.ResponseWriter(w, 200, nil, structs.NewOK(nil))
+		util.ResponseWriter(w, 200, nil, structs.NewOKRes(nil))
 	}
 }
