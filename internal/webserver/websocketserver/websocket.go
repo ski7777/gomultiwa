@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/calls"
+	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/util"
 )
 
 type WSServer struct {
@@ -40,6 +41,7 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
 	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
 	s.router.HandleFunc("/api/v1/registerclient", s.apihandler("registerclient")).Methods("POST")
+	s.router.NotFoundHandler = s.router.NewRoute().HandlerFunc(notfound).GetHandler()
 	s.server = &http.Server{
 		Addr:         config.GetAddr(),
 		WriteTimeout: time.Second * 15,
@@ -77,4 +79,8 @@ func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Requ
 		log.Fatal(errors.New("API NOT FOUND"))
 	}
 	return nil
+}
+
+func notfound(w http.ResponseWriter, _ *http.Request) {
+	util.ResponseWriter(w, 404, errors.New("Not Found!"), nil)
 }
