@@ -48,9 +48,6 @@ func (c *Config) load() error {
 	defer file.Close()
 	byteValue, _ := ioutil.ReadAll(file)
 	json.Unmarshal(byteValue, &c.Data)
-	if c.Data.WAClients.Clients == nil {
-		c.Data.WAClients.Clients = make(map[string]*waclient.WAClientConfig)
-	}
 	for k := range c.Data.WAClients.Clients {
 		c.Data.WAClients.Clients[k].ImportSession()
 	}
@@ -73,5 +70,7 @@ func (c *Config) Save() error {
 }
 
 func (c *Config) init() {
-	//build config from scratch here...
+	c.Data.WAClients = new(waclient.WAClients) //
+	c.Data.WAClients.Clients = make(map[string]*waclient.WAClientConfig)
+	c.Data.Userconfig = new([]*user.User)
 }
