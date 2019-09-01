@@ -39,6 +39,7 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	registerStaticFile(s.router, webbox, "index.html")
 	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
 	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
+	s.router.HandleFunc("/api/v1/registerclient", s.apihandler("registerclient")).Methods("POST")
 	s.server = &http.Server{
 		Addr:         config.GetAddr(),
 		WriteTimeout: time.Second * 15,
@@ -70,6 +71,8 @@ func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Requ
 	switch call {
 	case "sendmsg":
 		return calls.SendMsg(ws.wa)
+	case "registerclient":
+		return calls.RegisterClient(ws.wa)
 	default:
 		log.Fatal(errors.New("API NOT FOUND"))
 	}
