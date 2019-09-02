@@ -40,7 +40,7 @@ func (g *GoMultiWA) Start() error {
 		}
 	}()
 	go func() {
-		for g.stopsavethread {
+		for !g.stopsavethread {
 			if err := g.config.Save(); err != nil {
 				log.Fatal(err)
 			}
