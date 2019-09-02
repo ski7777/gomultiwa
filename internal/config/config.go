@@ -16,7 +16,7 @@ type Config struct {
 }
 
 type ConfigData struct {
-	Userconfig *[]*user.User       `json:"users"`
+	Userconfig *user.Users         `json:"users"`
 	WAClients  *waclient.WAClients `json:"clients"`
 }
 
@@ -79,6 +79,6 @@ func (c *Config) init() {
 		c.Data.WAClients.Clients = make(map[string]*waclient.WAClientConfig)
 	}
 	if c.Data.Userconfig == nil {
-		c.Data.Userconfig = new([]*user.User)
+		c.Data.Userconfig = user.NewUsers()
 	}
 }
