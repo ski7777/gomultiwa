@@ -35,8 +35,10 @@ func NewConfig(path string) (*Config, error) {
 		return nil, fmt.Errorf("NotADirectoryError: %s is not a valid file", config.path)
 	}
 	if err := config.load(); err != nil {
+		config.init()
 		return nil, err
 	}
+	config.init()
 	return config, nil
 }
 
@@ -70,7 +72,13 @@ func (c *Config) Save() error {
 }
 
 func (c *Config) init() {
-	c.Data.WAClients = new(waclient.WAClients) //
-	c.Data.WAClients.Clients = make(map[string]*waclient.WAClientConfig)
-	c.Data.Userconfig = new([]*user.User)
+	if c.Data.WAClients == nil {
+		c.Data.WAClients = new(waclient.WAClients)
+	}
+	if c.Data.WAClients.Clients == nil {
+		c.Data.WAClients.Clients = make(map[string]*waclient.WAClientConfig)
+	}
+	if c.Data.Userconfig == nil {
+		c.Data.Userconfig = new([]*user.User)
+	}
 }
