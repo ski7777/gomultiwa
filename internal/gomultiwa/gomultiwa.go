@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/config"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
+	"github.com/ski7777/gomultiwa/internal/usermanager"
 	"github.com/ski7777/gomultiwa/internal/waclient"
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver"
 )
@@ -20,6 +21,7 @@ type GoMultiWA struct {
 	stopsavethread       bool
 	savethreadstopped    bool
 	awaitingregistration map[string]*wa.Conn
+	usermanager          *usermanager.UserManager
 }
 
 func (g *GoMultiWA) Start() error {
@@ -91,6 +93,7 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	}
 	gmw.handlerhub = new(handlerhub.HandlerHub)
 	gmw.awaitingregistration = make(map[string]*wa.Conn)
+	gmw.usermanager = usermanager.NewUserManager(gmw.config.Data)
 	gmw.wsc = new(websocketserver.WSServerConfig)
 	gmw.wsc.Host = "0.0.0.0"
 	gmw.wsc.Port = 8888

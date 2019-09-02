@@ -1,7 +1,5 @@
 package user
 
-import "log"
-
 type Users struct {
 	Users []*User `json:"users"`
 }
