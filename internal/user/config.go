@@ -1,11 +1,11 @@
 package user
 
 type Users struct {
-	Users []*User `json:"users"`
+	Users *[]*User `json:"users"`
 }
 
 func NewUsers() *Users {
 	var u = new(Users)
-	u.Users = []*User{}
+	u.Users = &[]*User{}
 	return u
 }
