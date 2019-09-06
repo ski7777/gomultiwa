@@ -50,7 +50,7 @@
         "prepare-output": {
             "cmd": [
                 {
-                    "cmd": "mkdir output",
+                    "cmd": "mkdir -p output",
                     "type": "cmd"
                 }
             ],
