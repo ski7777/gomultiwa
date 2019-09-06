@@ -45,6 +45,15 @@ func (um *UserManager) SetUserPW(id string, pw string) error {
 	return errors.New("User ID not found")
 }
 
+func (um *UserManager) CheckUserPW(id string, pw string) (bool, error) {
+	for n := range *um.Userconfig.Users {
+		if (*um.Userconfig.Users)[n].ID == id {
+			return (*um.Userconfig.Users)[n].Password == genPWHash(pw), nil
+		}
+	}
+	return false, errors.New("User ID not found")
+}
+
 func NewUserManager(c config.ConfigData) *UserManager {
 	var um = new(UserManager)
 	um.Userconfig = c.Userconfig
