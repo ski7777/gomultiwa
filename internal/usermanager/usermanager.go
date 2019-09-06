@@ -54,6 +54,15 @@ func (um *UserManager) CheckUserPW(id string, pw string) (bool, error) {
 	return false, errors.New("User ID not found")
 }
 
+func (um *UserManager) GetUserIDByMail(mail string) (string, error) {
+	for n := range *um.Userconfig.Users {
+		if (*um.Userconfig.Users)[n].Mail == mail {
+			return (*um.Userconfig.Users)[n].ID, nil
+		}
+	}
+	return "", errors.New("Mailaddress not found")
+}
+
 func NewUserManager(c config.ConfigData) *UserManager {
 	var um = new(UserManager)
 	um.Userconfig = c.Userconfig
