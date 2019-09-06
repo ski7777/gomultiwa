@@ -1,6 +1,10 @@
 package user
 
 type User struct {
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Mail        string          `json:"mail"`
+	Password    string          `json:"password"`
 	Clients     []string        `json:"clients"`
 	Permissions []UserPermisson `json:"permissions"`
 	Admin       bool            `json:"admin"`
