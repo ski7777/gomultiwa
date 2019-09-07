@@ -1,13 +1,13 @@
 package user
 
 type User struct {
-	ID          string          `json:"id"`
-	Name        string          `json:"name"`
-	Mail        string          `json:"mail"`
-	Password    string          `json:"password"`
-	Clients     []string        `json:"clients"`
-	Permissions []UserPermisson `json:"permissions"`
-	Admin       bool            `json:"admin"`
+	ID          string            `json:"id"`
+	Name        string            `json:"name"`
+	Mail        string            `json:"mail"`
+	Password    string            `json:"password"`
+	Clients     *[]string         `json:"clients"`
+	Permissions *[]*UserPermisson `json:"permissions"`
+	Admin       bool              `json:"admin"`
 }
 
 const (
@@ -16,10 +16,10 @@ const (
 )
 
 type UserPermisson struct {
-	Cleint    string       `json:"client"`
-	Whitelist []Permission `json:"whitelist"`
-	Blacklist []Permission `json:"blacklist"`
-	Mode      int          `json:"mode"`
+	Cleint    string         `json:"client"`
+	Whitelist *[]*Permission `json:"whitelist"`
+	Blacklist *[]*Permission `json:"blacklist"`
+	Mode      int            `json:"mode"`
 }
 
 type Permission struct {
