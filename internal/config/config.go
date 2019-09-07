@@ -81,4 +81,12 @@ func (c *Config) init() {
 	if c.Data.Userconfig == nil {
 		c.Data.Userconfig = user.NewUsers()
 	}
+	for n := range *c.Data.Userconfig.Users {
+		if (*c.Data.Userconfig.Users)[n].Clients == nil {
+			(*c.Data.Userconfig.Users)[n].Clients = &[]string{}
+		}
+		if (*c.Data.Userconfig.Users)[n].Permissions == nil {
+			(*c.Data.Userconfig.Users)[n].Permissions = &[]*user.UserPermisson{}
+		}
+	}
 }
