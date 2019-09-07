@@ -31,6 +31,8 @@ func (um *UserManager) CreateUser(name string, mail string) (string, error) {
 	u.ID = id
 	u.Name = name
 	u.Mail = mail
+	u.Clients = &[]string{}
+	u.Permissions = &[]*user.UserPermisson{}
 	*um.Userconfig.Users = append(*um.Userconfig.Users, u)
 	return id, nil
 }
