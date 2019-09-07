@@ -2,6 +2,7 @@ package usermanager
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/config"
@@ -10,8 +11,9 @@ import (
 )
 
 type UserManager struct {
-	Userconfig *user.Users
-	WAClients  *waclient.WAClients
+	Userconfig     *user.Users
+	WAClients      *waclient.WAClients
+	userconfiglock sync.Mutex
 }
 
 func (um *UserManager) CreateUser(name string, mail string) (string, error) {
@@ -34,33 +36,45 @@ func (um *UserManager) CreateUser(name string, mail string) (string, error) {
 }
 
 func (um *UserManager) SetUserPW(id string, pw string) error {
-	for n := range *um.Userconfig.Users {
-		if (*um.Userconfig.Users)[n].ID == id {
-			x := genPWHash(pw)
-			(*um.Userconfig.Users)[n].Password = x
-			return nil
-
-		}
+	um.userconfiglock.Lock()
+	defer um.userconfiglock.Unlock()
+	if n, err := um.getUserIndexByID(id); err != nil {
+		return err
+	} else {
+		(*um.Userconfig.Users)[n].Password = genPWHash(pw)
+		return nil
 	}
-	return errors.New("User ID not found")
 }
 
 func (um *UserManager) CheckUserPW(id string, pw string) (bool, error) {
-	for n := range *um.Userconfig.Users {
-		if (*um.Userconfig.Users)[n].ID == id {
-			return (*um.Userconfig.Users)[n].Password == genPWHash(pw), nil
-		}
+	um.userconfiglock.Lock()
+	defer um.userconfiglock.Unlock()
+	if n, err := um.getUserIndexByID(id); err != nil {
+		return false, err
+	} else {
+		return (*um.Userconfig.Users)[n].Password == genPWHash(pw), nil
 	}
-	return false, errors.New("User ID not found")
 }
 
 func (um *UserManager) GetUserIDByMail(mail string) (string, error) {
+	um.userconfiglock.Lock()
+	defer um.userconfiglock.Unlock()
 	for n := range *um.Userconfig.Users {
 		if (*um.Userconfig.Users)[n].Mail == mail {
 			return (*um.Userconfig.Users)[n].ID, nil
 		}
 	}
 	return "", errors.New("Mailaddress not found")
+}
+
+func (um *UserManager) getUserIndexByID(id string) (int, error) {
+	for n := range *um.Userconfig.Users {
+		if (*um.Userconfig.Users)[n].ID == id {
+			return n, nil
+
+		}
+	}
+	return -1, errors.New("User ID not found")
 }
 
 func NewUserManager(c config.ConfigData) *UserManager {
