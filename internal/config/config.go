@@ -85,8 +85,5 @@ func (c *Config) init() {
 		if (*c.Data.Userconfig.Users)[n].Clients == nil {
 			(*c.Data.Userconfig.Users)[n].Clients = &[]string{}
 		}
-		if (*c.Data.Userconfig.Users)[n].Permissions == nil {
-			(*c.Data.Userconfig.Users)[n].Permissions = &[]*user.UserPermisson{}
-		}
 	}
 }
