@@ -79,6 +79,8 @@ func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Requ
 		return calls.RegisterClient(ws.wa)
 	case "login":
 		return calls.Login(ws.wa)
+	case "clients":
+		return calls.Clients(ws.wa)
 	default:
 		log.Fatal(errors.New("API NOT FOUND"))
 	}
