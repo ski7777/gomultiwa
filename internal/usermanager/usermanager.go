@@ -30,7 +30,7 @@ func (um *UserManager) CreateUser(name string, mail string) (string, error) {
 		return "", err
 	}
 	id := i.String()
-	var u = new(user.User)
+	u := new(user.User)
 	u.ID = id
 	u.Name = name
 	u.Mail = mail
@@ -186,7 +186,7 @@ func (um *UserManager) CheckUserExists(id string) bool {
 }
 
 func NewUserManager(c config.ConfigData) *UserManager {
-	var um = new(UserManager)
+	um := new(UserManager)
 	um.Userconfig = c.Userconfig
 	um.WAClients = c.WAClients
 	return um

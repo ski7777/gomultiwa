@@ -21,7 +21,7 @@ type ConfigData struct {
 }
 
 func NewConfig(path string) (*Config, error) {
-	var config = new(Config)
+	config := new(Config)
 	config.path = path
 	fi, err := os.Stat(config.path)
 	if err != nil {

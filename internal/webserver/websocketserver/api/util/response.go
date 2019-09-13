@@ -15,6 +15,8 @@ func ResponseWriter(w http.ResponseWriter, code int, err error, payload interfac
 	if e != nil {
 		ResponseWriter(w, 500, e, "")
 	} else {
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("Server", "golang/gomultiwa")
 		w.WriteHeader(code)
 		w.Write([]byte(data))
 	}

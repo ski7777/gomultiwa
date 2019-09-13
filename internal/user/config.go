@@ -5,7 +5,7 @@ type Users struct {
 }
 
 func NewUsers() *Users {
-	var u = new(Users)
+	u := new(Users)
 	u.Users = &[]*User{}
 	return u
 }
