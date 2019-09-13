@@ -11,7 +11,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
+	gmwi "github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/calls"
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/util"
 )
@@ -33,10 +33,10 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	s.wa = config.WA
 	s.router = mux.NewRouter()
 	_, filename, _, _ := runtime.Caller(0)
-	var webdir = path.Join(path.Dir(filename), "../../../web")
-	var webbox = packr.New(webdir, webdir)
-	var staticdir = path.Join(webdir, "static")
-	var staticbox = packr.New(staticdir, staticdir)
+	webdir := path.Join(path.Dir(filename), "../../../web")
+	webbox := packr.New(webdir, webdir)
+	staticdir := path.Join(webdir, "static")
+	staticbox := packr.New(staticdir, staticdir)
 	registerStaticFile(s.router, webbox, "index.html")
 	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
 	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
