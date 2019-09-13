@@ -146,6 +146,16 @@ func (um *UserManager) GetUserClients(id string) (*[]string, error) {
 	}
 }
 
+func (um *UserManager) GetUserByID(id string) (*user.User, error) {
+	um.userconfiglock.Lock()
+	defer um.userconfiglock.Unlock()
+	if n, err := um.getUserIndexByID(id); err != nil {
+		return nil, err
+	} else {
+		return (*um.Userconfig.Users)[n], nil
+	}
+}
+
 func (um *UserManager) GetUserIDByMail(mail string) (string, error) {
 	um.userconfiglock.Lock()
 	defer um.userconfiglock.Unlock()
@@ -161,10 +171,18 @@ func (um *UserManager) getUserIndexByID(id string) (int, error) {
 	for n := range *um.Userconfig.Users {
 		if (*um.Userconfig.Users)[n].ID == id {
 			return n, nil
-
 		}
 	}
 	return -1, errors.New("User ID not found")
+}
+
+func (um *UserManager) CheckUserExists(id string) bool {
+	for n := range *um.Userconfig.Users {
+		if (*um.Userconfig.Users)[n].ID == id {
+			return true
+		}
+	}
+	return false
 }
 
 func NewUserManager(c config.ConfigData) *UserManager {

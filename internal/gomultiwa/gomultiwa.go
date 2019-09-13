@@ -1,6 +1,7 @@
 package gomultiwa
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/config"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
+	"github.com/ski7777/gomultiwa/internal/sessionmanager"
+	"github.com/ski7777/gomultiwa/internal/user"
 	"github.com/ski7777/gomultiwa/internal/usermanager"
 	"github.com/ski7777/gomultiwa/internal/waclient"
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver"
@@ -22,6 +25,7 @@ type GoMultiWA struct {
 	savethreadstopped    bool
 	awaitingregistration map[string]*wa.Conn
 	usermanager          *usermanager.UserManager
+	sessionmanager       *sessionmanager.SessionManager
 }
 
 func (g *GoMultiWA) Start() error {
@@ -79,13 +83,35 @@ func (g *GoMultiWA) StartRegistration(user string) (chan string, string, error) 
 			return
 		}
 		g.config.Data.WAClients.Clients[id.String()] = wacc
-		// TODO: Add WAC to User
+		g.usermanager.AddUserClient(user, id.String())
 	}()
 	return qr, id.String(), nil
 }
+func (g *GoMultiWA) LoginMailPassword(mail string, password string) (string, error) {
+	if id, err := g.usermanager.GetUserIDByMail(mail); err != nil {
+		return "", errors.New("Mailaddress/Password wrong")
+	} else {
+		if ok, err := g.usermanager.CheckUserPW(id, password); err != nil {
+			return "", err
+		} else {
+			if ok {
+				if sess, err := g.sessionmanager.NewSession(id); err != nil {
+					return "", err
+				} else {
+					return sess, err
+				}
+			} else {
+				return "", errors.New("Mailaddress/Password wrong")
+			}
+		}
+	}
+}
+func (g *GoMultiWA) UseSession(sess string) (*user.User, error) {
+	return g.sessionmanager.UseSession(sess)
+}
 
 func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
-	var gmw = new(GoMultiWA)
+	gmw := new(GoMultiWA)
 	var err error
 	gmw.config, err = config.NewConfig(configpath)
 	if err != nil {
@@ -94,6 +120,7 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	gmw.handlerhub = new(handlerhub.HandlerHub)
 	gmw.awaitingregistration = make(map[string]*wa.Conn)
 	gmw.usermanager = usermanager.NewUserManager(gmw.config.Data)
+	gmw.sessionmanager = sessionmanager.NewSessionManager(gmw.usermanager)
 	gmw.wsc = new(websocketserver.WSServerConfig)
 	gmw.wsc.Host = "0.0.0.0"
 	gmw.wsc.Port = 8888
