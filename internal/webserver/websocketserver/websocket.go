@@ -41,6 +41,8 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
 	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
 	s.router.HandleFunc("/api/v1/registerclient", s.apihandler("registerclient")).Methods("POST")
+	s.router.HandleFunc("/api/v1/login", s.apihandler("login")).Methods("POST")
+	s.router.HandleFunc("/api/v1/clients", s.apihandler("clients")).Methods("POST")
 	s.router.NotFoundHandler = s.router.NewRoute().HandlerFunc(notfound).GetHandler()
 	s.server = &http.Server{
 		Addr:         config.GetAddr(),
@@ -75,6 +77,8 @@ func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Requ
 		return calls.SendMsg(ws.wa)
 	case "registerclient":
 		return calls.RegisterClient(ws.wa)
+	case "login":
+		return calls.Login(ws.wa)
 	default:
 		log.Fatal(errors.New("API NOT FOUND"))
 	}
