@@ -3,6 +3,7 @@ package gomultiwa
 import (
 	"errors"
 	"log"
+	"sync"
 	"time"
 
 	wa "github.com/Rhymen/go-whatsapp"
@@ -21,11 +22,11 @@ type GoMultiWA struct {
 	wsc                  *websocketserver.WSServerConfig
 	ws                   *websocketserver.WSServer
 	handlerhub           *handlerhub.HandlerHub
-	stopsavethread       bool
-	savethreadstopped    bool
+	stopthreads          bool
 	awaitingregistration map[string]*wa.Conn
 	usermanager          *usermanager.UserManager
 	sessionmanager       *sessionmanager.SessionManager
+	threadwait           sync.WaitGroup
 }
 
 func (g *GoMultiWA) Start() error {
@@ -46,15 +47,31 @@ func (g *GoMultiWA) Start() error {
 		}
 	}()
 	go func() {
-		for !g.stopsavethread {
+		g.threadwait.Add(1)
+		for !g.stopthreads {
 			if err := g.config.Save(); err != nil {
 				log.Fatal(err)
 			}
 			time.Sleep(5 * time.Second)
 		}
-		g.savethreadstopped = true
+		g.threadwait.Done()
+	}()
+	go func() {
+		g.threadwait.Add(1)
+		for !g.stopthreads {
+			g.sessionmanager.Cleanup()
+			time.Sleep(5 * time.Second)
+		}
+		g.threadwait.Done()
 	}()
 	return nil
+}
+
+func (g *GoMultiWA) Stop() {
+	log.Println("Stopping all threads...")
+	g.stopthreads = true
+	g.threadwait.Wait()
+	log.Fatal("All thredas stopped")
 }
 
 func (g *GoMultiWA) GetClients() *waclient.WAClients {
