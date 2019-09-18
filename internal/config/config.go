@@ -10,17 +10,20 @@ import (
 	"github.com/ski7777/gomultiwa/internal/waclient"
 )
 
+// Config represents the path, the data and the hash of the currently saved data
 type Config struct {
 	path string
-	Data ConfigData
+	Data Data
 	hash string
 }
 
-type ConfigData struct {
+// Data represents the configuration itself
+type Data struct {
 	Userconfig *user.Users         `json:"users"`
 	WAClients  *waclient.WAClients `json:"clients"`
 }
 
+// NewConfig returns a new Config struct
 func NewConfig(path string) (*Config, error) {
 	config := new(Config)
 	config.path = path
@@ -58,6 +61,7 @@ func (c *Config) load() error {
 	return nil
 }
 
+// Save saves the config to the file
 func (c *Config) Save() error {
 	for k := range c.Data.WAClients.Clients {
 		c.Data.WAClients.Clients[k].ExportSession()
