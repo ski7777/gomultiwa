@@ -6,8 +6,8 @@ import (
 
 type HandlerHub struct{}
 
-func (hh *HandlerHub) HandleError(err error, id string)                          {}
-func (hh *HandlerHub) HandleTextMessage(message whatsapp.TextMessage, id string) {}
+func (hh *HandlerHub) HandleError(err error, id string)                                          {}
+func (hh *HandlerHub) HandleTextMessage(message whatsapp.TextMessage, id string)                 {}
 func (hh *HandlerHub) HandleImageMessage(message whatsapp.ImageMessage, id string)               {}
 func (hh *HandlerHub) HandleDocumentMessage(message whatsapp.DocumentMessage, id string)         {}
 func (hh *HandlerHub) HandleVideoMessage(message whatsapp.VideoMessage, id string)               {}
