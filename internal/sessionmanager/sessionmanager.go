@@ -15,6 +15,7 @@ const (
 	timeout = int64(180 * 24 * time.Hour)
 )
 
+// SessionManager represents a list of sessions connected with a UserManager
 type SessionManager struct {
 	um          *usermanager.UserManager
 	sessions    map[string]*session.Session
