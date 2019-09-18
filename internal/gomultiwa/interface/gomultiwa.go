@@ -2,6 +2,7 @@ package gmwi
 
 import (
 	"github.com/ski7777/gomultiwa/internal/user"
+	"github.com/ski7777/gomultiwa/internal/usermanager"
 	"github.com/ski7777/gomultiwa/internal/waclient"
 )
 
@@ -12,4 +13,5 @@ type GoMultiWAInterface interface {
 	UseSession(sess string) (*user.User, error)
 	Stop()
 	SaveConfig() error
+	GetUserManager() *usermanager.UserManager
 }

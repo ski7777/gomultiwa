@@ -137,6 +137,10 @@ func (g *GoMultiWA) SaveConfig() error {
 	return g.config.Save()
 }
 
+func (g *GoMultiWA) GetUserManager() *usermanager.UserManager {
+	return g.usermanager
+}
+
 func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	gmw := new(GoMultiWA)
 	var err error
