@@ -19,6 +19,7 @@ import (
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver"
 )
 
+// GoMultiWA represents the mixure of a config file, multiple WhatsApp sessions, a web(socket)server, ...
 type GoMultiWA struct {
 	config               *config.Config
 	wsc                  *websocketserver.WSServerConfig
@@ -32,6 +33,7 @@ type GoMultiWA struct {
 	shell                *shell.Shell
 }
 
+// Start starts all background processes
 func (g *GoMultiWA) Start() {
 	go func() {
 		for k := range g.config.Data.WAClients.Clients {
@@ -91,6 +93,7 @@ func (g *GoMultiWA) Start() {
 	go g.shell.Start()
 }
 
+// Stop stopps all backround processes and closes the application
 func (g *GoMultiWA) Stop() {
 	log.Println("Stopping all threads...")
 	g.stopthreads = true
@@ -99,10 +102,12 @@ func (g *GoMultiWA) Stop() {
 	os.Exit(0)
 }
 
+// GetClients returns the WAClients struct
 func (g *GoMultiWA) GetClients() *waclient.WAClients {
 	return g.config.Data.WAClients
 }
 
+// StartRegistration starts the registration of a new WhatsApp client and returns a qr-code chan and the client id
 func (g *GoMultiWA) StartRegistration(user string) (chan string, string, error) {
 	id, _ := uuid.NewRandom()
 	wac, err := wa.NewConn(5 * time.Second)
@@ -129,37 +134,44 @@ func (g *GoMultiWA) StartRegistration(user string) (chan string, string, error) 
 	}()
 	return qr, id.String(), nil
 }
+
+// LoginMailPassword checks the mailaddress/password-pair and returns a session id if valid
 func (g *GoMultiWA) LoginMailPassword(mail string, password string) (string, error) {
-	if id, err := g.usermanager.GetUserIDByMail(mail); err != nil {
+	var id string
+	var err error
+	if id, err = g.usermanager.GetUserIDByMail(mail); err != nil {
 		return "", errors.New("Mailaddress/Password wrong")
-	} else {
-		if ok, err := g.usermanager.CheckUserPW(id, password); err != nil {
-			return "", err
-		} else {
-			if ok {
-				if sess, err := g.sessionmanager.NewSession(id); err != nil {
-					return "", err
-				} else {
-					return sess, err
-				}
-			} else {
-				return "", errors.New("Mailaddress/Password wrong")
-			}
-		}
 	}
+	var ok bool
+	if ok, err = g.usermanager.CheckUserPW(id, password); err != nil {
+		return "", err
+	}
+	if ok {
+		var sess string
+		if sess, err = g.sessionmanager.NewSession(id); err != nil {
+			return "", err
+		}
+		return sess, err
+	}
+	return "", errors.New("Mailaddress/Password wrong")
 }
+
+// UseSession triggers a sessions´s usage function and returns the user struct
 func (g *GoMultiWA) UseSession(sess string) (*user.User, error) {
 	return g.sessionmanager.UseSession(sess)
 }
 
+// SaveConfig triggers the manual save of the config
 func (g *GoMultiWA) SaveConfig() error {
 	return g.config.Save()
 }
 
+// GetUserManager returns the UserManager struct
 func (g *GoMultiWA) GetUserManager() *usermanager.UserManager {
 	return g.usermanager
 }
 
+// NewGoMultiWA returns a new GoMultiWA struct
 func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	gmw := new(GoMultiWA)
 	var err error
