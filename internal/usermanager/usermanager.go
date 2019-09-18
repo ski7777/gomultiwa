@@ -185,7 +185,7 @@ func (um *UserManager) CheckUserExists(id string) bool {
 	return false
 }
 
-func NewUserManager(c config.ConfigData) *UserManager {
+func NewUserManager(c config.Data) *UserManager {
 	um := new(UserManager)
 	um.Userconfig = c.Userconfig
 	um.WAClients = c.WAClients
