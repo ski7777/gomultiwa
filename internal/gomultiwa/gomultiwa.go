@@ -3,6 +3,7 @@ package gomultiwa
 import (
 	"errors"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -128,6 +129,10 @@ func (g *GoMultiWA) LoginMailPassword(mail string, password string) (string, err
 }
 func (g *GoMultiWA) UseSession(sess string) (*user.User, error) {
 	return g.sessionmanager.UseSession(sess)
+}
+
+func (g *GoMultiWA) SaveConfig() error {
+	return g.config.Save()
 }
 
 func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
