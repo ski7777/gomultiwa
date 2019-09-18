@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/ski7777/gomultiwa/internal/user"
@@ -13,6 +14,7 @@ import (
 type Config struct {
 	path string
 	Data ConfigData
+	hash string
 }
 
 type ConfigData struct {
@@ -23,6 +25,7 @@ type ConfigData struct {
 func NewConfig(path string) (*Config, error) {
 	config := new(Config)
 	config.path = path
+	config.hash = ""
 	fi, err := os.Stat(config.path)
 	if err != nil {
 		config.init()
@@ -64,9 +67,11 @@ func (c *Config) Save() error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(c.path, datajson, 0644)
-	if err != nil {
-		return err
+	if hash := getConfigHash(datajson); hash != c.hash {
+		c.hash = hash
+		if err := ioutil.WriteFile(c.path, datajson, 0644); err != nil {
+			return err
+		}
 	}
 	return nil
 }
