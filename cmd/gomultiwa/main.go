@@ -22,9 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := gmw.Start(); err != nil {
-		log.Fatal(err)
-	}
+	gmw.Start()
 	log.Println("Ready")
 	<-make(chan int, 1)
 }

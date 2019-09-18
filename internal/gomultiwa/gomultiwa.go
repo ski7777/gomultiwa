@@ -29,18 +29,20 @@ type GoMultiWA struct {
 	threadwait           sync.WaitGroup
 }
 
-func (g *GoMultiWA) Start() error {
+func (g *GoMultiWA) Start() {
+	go func() {
 	for k := range g.config.Data.WAClients.Clients {
 		handler := new(waclient.WAHandler)
 		handler.SetID(k)
 		if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
-			return err
+				log.Println(err)
 		}
 		g.config.Data.WAClients.Clients[k].WAClient.WA.AddHandler(handler)
 	}
 	if err := g.config.Save(); err != nil {
-		return err
+			log.Fatal(err)
 	}
+	}()
 	go func() {
 		if err := g.ws.Start(); err != nil {
 			log.Fatal(err)
@@ -49,7 +51,7 @@ func (g *GoMultiWA) Start() error {
 	go func() {
 		g.threadwait.Add(1)
 		for !g.stopthreads {
-			if err := g.config.Save(); err != nil {
+			if err := g.SaveConfig(); err != nil {
 				log.Fatal(err)
 			}
 			time.Sleep(5 * time.Second)
@@ -71,7 +73,8 @@ func (g *GoMultiWA) Stop() {
 	log.Println("Stopping all threads...")
 	g.stopthreads = true
 	g.threadwait.Wait()
-	log.Fatal("All thredas stopped")
+	log.Println("All thredas stopped")
+	os.Exit(0)
 }
 
 func (g *GoMultiWA) GetClients() *waclient.WAClients {
