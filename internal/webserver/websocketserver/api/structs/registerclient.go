@@ -2,6 +2,7 @@ package structs
 
 type RegisterClientReq struct {
 	PNG     bool   `json:"png"`
+	PNGRAW  bool   `json:"pngraw"`
 	Session string `json:"sess"`
 }
 

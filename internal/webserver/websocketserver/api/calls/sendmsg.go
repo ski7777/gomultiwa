@@ -14,11 +14,11 @@ func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := new(structs.SendmsgReq)
 		if err := util.RequestLoader(w, r, req); err != nil {
-			util.ResponseWriter(w, 400, err, nil)
+			util.ResponseWriter(w, 400, err, nil, nil, "")
 			return
 		}
 		if u, err := wa.UseSession(req.Session); err != nil {
-			util.ResponseWriter(w, 403, err, nil)
+			util.ResponseWriter(w, 403, err, nil, nil, "")
 		} else {
 			found := false
 			for _, c := range *u.Clients {
@@ -27,7 +27,7 @@ func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 				}
 			}
 			if !found {
-				util.ResponseWriter(w, 404, errors.New("WA Client ID not found!"), nil)
+				util.ResponseWriter(w, 404, errors.New("WA Client ID not found!"), nil, nil, "")
 				return
 			}
 			if _, err := wa.GetClients().Clients[req.ID].WAClient.WA.Send(whatsapp.TextMessage{
@@ -36,10 +36,10 @@ func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 				},
 				Text: req.MSG,
 			}); err != nil {
-				util.ResponseWriter(w, 500, err, nil)
+				util.ResponseWriter(w, 500, err, nil, nil, "")
 				return
 			}
-			util.ResponseWriter(w, 200, nil, structs.NewOKRes(nil))
+			util.ResponseWriter(w, 200, nil, structs.NewOKRes(nil), nil, "")
 		}
 	}
 }

@@ -12,11 +12,11 @@ func Clients(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := new(structs.ClientsReq)
 		if err := util.RequestLoader(w, r, req); err != nil {
-			util.ResponseWriter(w, 400, err, nil)
+			util.ResponseWriter(w, 400, err, nil, nil, "")
 			return
 		}
 		if u, err := wa.UseSession(req.Session); err != nil {
-			util.ResponseWriter(w, 403, err, nil)
+			util.ResponseWriter(w, 403, err, nil, nil, "")
 		} else {
 			res := new(structs.ClientsRes)
 			res.Clients = make(map[string]string)
@@ -24,7 +24,7 @@ func Clients(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 			for _, i := range *u.Clients {
 				res.Clients[i] = clients[i].Session.Wid
 			}
-			util.ResponseWriter(w, 200, nil, structs.NewOKRes(res))
+			util.ResponseWriter(w, 200, nil, structs.NewOKRes(res), nil, "")
 		}
 	}
 }
