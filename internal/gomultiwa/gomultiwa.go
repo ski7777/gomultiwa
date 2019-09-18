@@ -10,6 +10,7 @@ import (
 	wa "github.com/Rhymen/go-whatsapp"
 	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/config"
+	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
 	"github.com/ski7777/gomultiwa/internal/sessionmanager"
 	"github.com/ski7777/gomultiwa/internal/user"
@@ -28,21 +29,22 @@ type GoMultiWA struct {
 	usermanager          *usermanager.UserManager
 	sessionmanager       *sessionmanager.SessionManager
 	threadwait           sync.WaitGroup
+	shell                *shell.Shell
 }
 
 func (g *GoMultiWA) Start() {
 	go func() {
-	for k := range g.config.Data.WAClients.Clients {
-		handler := new(waclient.WAHandler)
-		handler.SetID(k)
-		if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
+		for k := range g.config.Data.WAClients.Clients {
+			handler := new(waclient.WAHandler)
+			handler.SetID(k)
+			if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
 				log.Println(err)
+			}
+			g.config.Data.WAClients.Clients[k].WAClient.WA.AddHandler(handler)
 		}
-		g.config.Data.WAClients.Clients[k].WAClient.WA.AddHandler(handler)
-	}
-	if err := g.config.Save(); err != nil {
+		if err := g.config.Save(); err != nil {
 			log.Fatal(err)
-	}
+		}
 	}()
 	go func() {
 		if err := g.ws.Start(); err != nil {
@@ -67,7 +69,7 @@ func (g *GoMultiWA) Start() {
 		}
 		g.threadwait.Done()
 	}()
-	return nil
+	go g.shell.Start()
 }
 
 func (g *GoMultiWA) Stop() {
@@ -151,5 +153,6 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	gmw.wsc.Port = 8888
 	gmw.wsc.WA = gmw
 	gmw.ws = websocketserver.NewWSServer(gmw.wsc)
+	gmw.shell = shell.NewShell(gmw)
 	return gmw, nil
 }
