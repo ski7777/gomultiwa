@@ -17,6 +17,7 @@ func NewShell(gmw gmwi.GoMultiWAInterface) *Shell {
 	s.gmw = gmw
 	s.shell.AddCmd(commands.GetCmdSave(gmw))
 	s.shell.AddCmd(commands.GetCmdExit(gmw))
+	s.shell.AddCmd(commands.GetCmdNewUser(gmw))
 	return s
 }
 
