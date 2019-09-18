@@ -4,8 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"path"
-	"runtime"
 	"time"
 
 	"github.com/gobuffalo/packr/v2"
@@ -32,11 +30,11 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	s := new(WSServer)
 	s.wa = config.WA
 	s.router = mux.NewRouter()
-	_, filename, _, _ := runtime.Caller(0)
-	webdir := path.Join(path.Dir(filename), "../../../web")
-	webbox := packr.New(webdir, webdir)
-	staticdir := path.Join(webdir, "static")
-	staticbox := packr.New(staticdir, staticdir)
+	//_, filename, _, _ := runtime.Caller(0)
+	//webdir := path.Join(path.Dir(filename), "../../../web")
+	webbox := packr.New("web", "../../../web")
+	//staticdir := path.Join(webdir, "static")
+	staticbox := packr.New("web/static", "../../../web/static")
 	registerStaticFile(s.router, webbox, "index.html")
 	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
 	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
@@ -88,5 +86,5 @@ func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Requ
 }
 
 func notfound(w http.ResponseWriter, _ *http.Request) {
-	util.ResponseWriter(w, 404, errors.New("Not Found!"), nil)
+	util.ResponseWriter(w, 404, errors.New("Not Found!"), nil, nil, "")
 }

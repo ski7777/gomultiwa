@@ -9,7 +9,15 @@
             ],
             "cmd": [
                 {
-                    "cmd": "packr build -o output/gomultiwa cmd/gomultiwa/main.go",
+                    "cmd": "GO111MODULE=on packr2 build -o output/gomultiwa cmd/gomultiwa/main.go",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "GO111MODULE=on go build -o output/gomultiwa cmd/gomultiwa/main.go",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "cp cmd/gomultiwa/output/gomultiwa output",
                     "type": "cmd"
                 }
             ],

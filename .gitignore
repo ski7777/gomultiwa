@@ -17,3 +17,4 @@ output
 awesomestatus.json
 AwesomeStats.pdf
 gomultiwa.json
+*-packr.go
