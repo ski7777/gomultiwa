@@ -7,6 +7,7 @@ import (
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/structs"
 )
 
+// ResponseWriter writes respnse based on respnse code, error, json payload (struct), rawpayload ([]byte) and contenttype
 func ResponseWriter(w http.ResponseWriter, code int, err error, payload interface{}, rawpayload []byte, rawcontenttype string) {
 	if err != nil {
 		payload = structs.NewError(err)
@@ -18,10 +19,9 @@ func ResponseWriter(w http.ResponseWriter, code int, err error, payload interfac
 		if e != nil {
 			ResponseWriter(w, 500, e, nil, nil, "")
 			return
-		} else {
-			rawdata = []byte(data)
-			contenttype = "application/json"
 		}
+		rawdata = []byte(data)
+		contenttype = "application/json"
 	} else if rawpayload != nil {
 		rawdata = rawpayload
 		contenttype = rawcontenttype
