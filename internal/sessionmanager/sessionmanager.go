@@ -22,6 +22,7 @@ type SessionManager struct {
 	sessionlock sync.Mutex
 }
 
+// NewSession returns a new session id and registers the new session
 func (sm *SessionManager) NewSession(user string) (string, error) {
 	if sm.um.CheckUserExists(user) {
 		i, _ := uuid.NewRandom()
@@ -34,6 +35,7 @@ func (sm *SessionManager) NewSession(user string) (string, error) {
 	return "", errors.New("User does not exist")
 }
 
+// Cleanup deletes all timedout sessions
 func (sm *SessionManager) Cleanup() {
 	sm.sessionlock.Lock()
 	defer sm.sessionlock.Unlock()
@@ -44,6 +46,7 @@ func (sm *SessionManager) Cleanup() {
 	}
 }
 
+// UseSession triggers session usage
 func (sm *SessionManager) UseSession(sess string) (*user.User, error) {
 	sm.sessionlock.Lock()
 	defer sm.sessionlock.Unlock()
@@ -51,17 +54,18 @@ func (sm *SessionManager) UseSession(sess string) (*user.User, error) {
 		if err := s.Use(); err != nil {
 			return nil, err
 		}
-		if u, err := sm.um.GetUserByID(s.GetUserID()); err != nil {
+		var u *user.User
+		var err error
+		if u, err = sm.um.GetUserByID(s.GetUserID()); err != nil {
 			return nil, err
-		} else {
-			return u, nil
 		}
-	} else {
-		return nil, errors.New("Session ID invalid")
+		return u, nil
 	}
+	return nil, errors.New("Session ID invalid")
 
 }
 
+// NewSessionManager returns new SessionManager
 func NewSessionManager(um *usermanager.UserManager) *SessionManager {
 	sm := new(SessionManager)
 	sm.um = um
