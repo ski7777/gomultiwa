@@ -10,6 +10,7 @@ import (
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/util"
 )
 
+// SendMsg executes the sendmsg call
 func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := new(structs.SendmsgReq)
@@ -27,7 +28,7 @@ func SendMsg(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request
 				}
 			}
 			if !found {
-				util.ResponseWriter(w, 404, errors.New("WA Client ID not found!"), nil, nil, "")
+				util.ResponseWriter(w, 404, errors.New("WA Client ID not found"), nil, nil, "")
 				return
 			}
 			if _, err := wa.GetClients().Clients[req.ID].WAClient.WA.Send(whatsapp.TextMessage{

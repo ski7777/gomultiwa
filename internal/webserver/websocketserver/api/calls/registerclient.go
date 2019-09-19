@@ -10,6 +10,7 @@ import (
 	qrcode "github.com/skip2/go-qrcode"
 )
 
+// RegisterClient executes the registerclient call
 func RegisterClient(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := new(structs.RegisterClientReq)
@@ -37,9 +38,8 @@ func RegisterClient(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.
 				if req.PNGRAW {
 					util.ResponseWriter(w, 200, nil, nil, png, "image/png")
 					return
-				} else {
-					res.PNG = base64.StdEncoding.EncodeToString(png)
 				}
+				res.PNG = base64.StdEncoding.EncodeToString(png)
 			}
 			util.ResponseWriter(w, 200, nil, structs.NewOKRes(res), nil, "")
 		}

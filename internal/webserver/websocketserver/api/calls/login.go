@@ -8,6 +8,7 @@ import (
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/util"
 )
 
+// Login executes the login call
 func Login(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req = new(structs.LoginReq)

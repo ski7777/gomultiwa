@@ -8,6 +8,7 @@ import (
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/util"
 )
 
+// Clients executes the clients call
 func Clients(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := new(structs.ClientsReq)
