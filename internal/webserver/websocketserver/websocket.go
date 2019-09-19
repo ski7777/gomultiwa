@@ -14,6 +14,7 @@ import (
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/util"
 )
 
+// WSServer represents a http.Server, the gomultiwa instance, a websocket upgrader and router
 type WSServer struct {
 	server   *http.Server
 	wa       gmwi.GoMultiWAInterface
@@ -21,11 +22,13 @@ type WSServer struct {
 	router   *mux.Router
 }
 
+// WSServerConfig represents the initial config for WSServer
 type WSServerConfig struct {
 	HTTPServerConfig
 	WA gmwi.GoMultiWAInterface
 }
 
+// NewWSServer returns new WSServer
 func NewWSServer(config *WSServerConfig) *WSServer {
 	s := new(WSServer)
 	s.wa = config.WA
@@ -53,8 +56,9 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	return s
 }
 
-func (s *WSServer) Start() error {
-	return s.server.ListenAndServe()
+// Start stars the server
+func (ws *WSServer) Start() error {
+	return ws.server.ListenAndServe()
 }
 
 func registerStaticFile(router *mux.Router, box *packr.Box, name string) {
@@ -86,5 +90,5 @@ func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Requ
 }
 
 func notfound(w http.ResponseWriter, _ *http.Request) {
-	util.ResponseWriter(w, 404, errors.New("Not Found!"), nil, nil, "")
+	util.ResponseWriter(w, 404, errors.New("Not Found"), nil, nil, "")
 }
