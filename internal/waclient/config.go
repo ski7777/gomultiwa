@@ -4,18 +4,21 @@ import (
 	wa "github.com/Rhymen/go-whatsapp"
 )
 
+// WAClients represents a map clientid(string)->waclient(Config)
 type WAClients struct {
-	Clients map[string]*WAClientConfig `json:"clients"`
+	Clients map[string]*Config `json:"clients"`
 }
 
-type WAClientConfig struct {
-	session  *wa.Session  `json:"-"`
+// Config represents the WAClient, session and JSON session
+type Config struct {
+	session  *wa.Session
 	Session  *JSONSession `json:"session"`
 	WAClient *WAClient    `json:"-"`
 }
 
+// JSONSession represents a normal wa.Session but JSON serializeable
 type JSONSession struct {
-	ClientId    string `json:"ClientId"`
+	ClientID    string `json:"ClientId"`
 	ClientToken string `json:"ClientToken"`
 	ServerToken string `json:"ServerToken"`
 	EncKey      []byte `json:"EncKey"`
@@ -24,18 +27,21 @@ type JSONSession struct {
 }
 
 func (j *JSONSession) getSession() *wa.Session {
-	return &wa.Session{j.ClientId, j.ClientToken, j.ServerToken, j.EncKey, j.MacKey, j.Wid}
+	return &wa.Session{j.ClientID, j.ClientToken, j.ServerToken, j.EncKey, j.MacKey, j.Wid}
 }
 
-func (w *WAClientConfig) ImportSession() {
+// ImportSession imports the JSONSession as wa.Session
+func (w *Config) ImportSession() {
 	w.session = w.Session.getSession()
 }
 
-func (w *WAClientConfig) ExportSession() {
-	w.Session = newJsonSession(w.session)
+// ExportSession exports the wa.Session as JSONSession
+func (w *Config) ExportSession() {
+	w.Session = newJSONSession(w.session)
 }
 
-func (w *WAClientConfig) Connect() error {
+// Connect creates a new WAClient based on session info
+func (w *Config) Connect() error {
 	var err error
 	w.WAClient, err = NewWAClient(w.session)
 	if err != nil {
@@ -44,12 +50,13 @@ func (w *WAClientConfig) Connect() error {
 	return nil
 }
 
-func newJsonSession(s *wa.Session) *JSONSession {
+func newJSONSession(s *wa.Session) *JSONSession {
 	return &JSONSession{s.ClientId, s.ClientToken, s.ServerToken, s.EncKey, s.MacKey, s.Wid}
 }
 
-func NewWAClientConfig(s *wa.Session) *WAClientConfig {
-	c := new(WAClientConfig)
+// NewConfig returns a new Config
+func NewConfig(s *wa.Session) *Config {
+	c := new(Config)
 	c.session = s
 	return c
 }

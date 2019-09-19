@@ -124,7 +124,7 @@ func (g *GoMultiWA) StartRegistration(user string) (chan string, string, error) 
 			return
 		}
 		delete(g.awaitingregistration, id.String())
-		wacc := waclient.NewWAClientConfig(&session)
+		wacc := waclient.NewConfig(&session)
 		if err := wacc.Connect(); err != nil {
 			log.Println(err)
 			return
