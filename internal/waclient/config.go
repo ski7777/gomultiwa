@@ -27,7 +27,7 @@ type JSONSession struct {
 }
 
 func (j *JSONSession) getSession() *wa.Session {
-	return &wa.Session{j.ClientID, j.ClientToken, j.ServerToken, j.EncKey, j.MacKey, j.Wid}
+	return &wa.Session{ClientId: j.ClientID, ClientToken: j.ClientToken, ServerToken: j.ServerToken, EncKey: j.EncKey, MacKey: j.MacKey, Wid: j.Wid}
 }
 
 // ImportSession imports the JSONSession as wa.Session
