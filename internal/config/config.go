@@ -84,7 +84,7 @@ func (c *Config) init() {
 		c.Data.WAClients = new(waclient.WAClients)
 	}
 	if c.Data.WAClients.Clients == nil {
-		c.Data.WAClients.Clients = make(map[string]*waclient.ConfigNewWAClientConfig)
+		c.Data.WAClients.Clients = make(map[string]*waclient.Config)
 	}
 	if c.Data.Userconfig == nil {
 		c.Data.Userconfig = user.NewUsers()
