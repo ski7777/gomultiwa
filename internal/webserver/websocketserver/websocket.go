@@ -68,7 +68,9 @@ func registerStaticFile(router *mux.Router, box *packr.Box, name string) {
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			w.WriteHeader(http.StatusOK)
-			w.Write(data)
+			if _, err := w.Write(data); err != nil {
+				log.Println(err)
+			}
 		}
 	})
 }

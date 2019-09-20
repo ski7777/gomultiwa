@@ -1,6 +1,7 @@
 package waclient
 
 import (
+	"log"
 	"time"
 
 	wa "github.com/Rhymen/go-whatsapp"
@@ -21,7 +22,9 @@ type WAClient struct {
 func NewWAClient(session *wa.Session) (*WAClient, error) {
 	gmw := new(WAClient)
 	gmw.WA, _ = wa.NewConn(5 * time.Second)
-	gmw.WA.SetClientName(longclientname, shortclientname)
+	if err := gmw.WA.SetClientName(longclientname, shortclientname); err != nil {
+		log.Println(err)
+	}
 	sess, err := gmw.WA.RestoreWithSession(*session)
 	if err != nil {
 		gmw.session = sess

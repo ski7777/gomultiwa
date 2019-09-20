@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/ski7777/gomultiwa/internal/webserver/websocketserver/api/structs"
@@ -34,5 +35,7 @@ func ResponseWriter(w http.ResponseWriter, code int, err error, payload interfac
 	if contenttype == "" {
 		w.Header().Add("Content-Type", contenttype)
 	}
-	w.Write(rawdata)
+	if _, err := w.Write(rawdata); err != nil {
+		log.Println(err)
+	}
 }

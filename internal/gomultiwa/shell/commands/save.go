@@ -9,7 +9,9 @@ func GetCmdSave(gmw gmwi.GoMultiWAInterface) *ishell.Cmd {
 		Name: "save",
 		Help: "Save config",
 		Func: func(c *ishell.Context) {
-			gmw.SaveConfig()
+			if err:=gmw.SaveConfig();err!=nil{
+				c.Println(err)
+			}
 		},
 	}
 }
