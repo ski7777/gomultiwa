@@ -29,7 +29,7 @@ func RegisterClient(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.
 			res := new(structs.RegisterClientRes)
 			res.ID = id
 			res.Token = <-qr
-			if req.PNG == true {
+			if req.PNG {
 				png, err := qrcode.Encode(res.Token, qrcode.Medium, 300)
 				if err != nil {
 					util.ResponseWriter(w, 500, err, nil, nil, "")

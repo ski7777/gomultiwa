@@ -33,6 +33,8 @@ type GoMultiWA struct {
 	shell                *shell.Shell
 }
 
+type fn func()
+
 // Start starts all background processes
 func (g *GoMultiWA) Start() {
 	go func() {
@@ -53,44 +55,40 @@ func (g *GoMultiWA) Start() {
 			log.Fatal(err)
 		}
 	}()
-	go func() {
-		g.threadwait.Add(1)
-		for !g.stopthreads {
-			if err := g.SaveConfig(); err != nil {
-				log.Fatal(err)
-			}
-			time.Sleep(5 * time.Second)
+	g.startthread(func() {
+		if err := g.SaveConfig(); err != nil {
+			log.Fatal(err)
 		}
-		g.threadwait.Done()
-	}()
-	go func() {
-		g.threadwait.Add(1)
-		for !g.stopthreads {
-			g.sessionmanager.Cleanup()
-			time.Sleep(5 * time.Second)
-		}
-		g.threadwait.Done()
-	}()
-	go func() {
-		g.threadwait.Add(1)
-		for !g.stopthreads {
-			for k := range g.config.Data.WAClients.Clients {
-				if w := g.config.Data.WAClients.Clients[k].WAClient; w != nil {
-					if result, err := w.WA.AdminTest(); !result {
-						if err == wa.ErrNotConnected {
-							log.Println("Reconnecting " + k + "(" + g.config.Data.WAClients.Clients[k].Session.Wid + ")")
-							if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
-								log.Println(err)
-							}
+	}, 5*time.Second)
+	g.startthread(func() {
+		g.sessionmanager.Cleanup()
+	}, 5*time.Second)
+	g.startthread(func() {
+		for k := range g.config.Data.WAClients.Clients {
+			if w := g.config.Data.WAClients.Clients[k].WAClient; w != nil {
+				if result, err := w.WA.AdminTest(); !result {
+					if err == wa.ErrNotConnected {
+						log.Println("Reconnecting " + k + "(" + g.config.Data.WAClients.Clients[k].Session.Wid + ")")
+						if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
+							log.Println(err)
 						}
 					}
 				}
 			}
-			time.Sleep(5 * time.Second)
+		}
+	}, 5*time.Second)
+	go g.shell.Start()
+}
+
+func (g *GoMultiWA) startthread(f fn, wait time.Duration) {
+	g.threadwait.Add(1)
+	go func() {
+		for !g.stopthreads {
+			f()
+			time.Sleep(wait)
 		}
 		g.threadwait.Done()
 	}()
-	go g.shell.Start()
 }
 
 // Stop stopps all backround processes and closes the application
