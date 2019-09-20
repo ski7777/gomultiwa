@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/ski7777/gomultiwa/internal/user"
@@ -54,7 +55,9 @@ func (c *Config) load() error {
 	}
 	defer file.Close()
 	byteValue, _ := ioutil.ReadAll(file)
-	json.Unmarshal(byteValue, &c.Data)
+	if err := json.Unmarshal(byteValue, &c.Data); err != nil {
+		log.Fatal(err)
+	}
 	for k := range c.Data.WAClients.Clients {
 		c.Data.WAClients.Clients[k].ImportSession()
 	}

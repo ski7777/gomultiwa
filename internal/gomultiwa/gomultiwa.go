@@ -128,7 +128,9 @@ func (g *GoMultiWA) StartRegistration(user string) (chan string, string, error) 
 			return
 		}
 		g.config.Data.WAClients.Clients[id.String()] = wacc
-		g.usermanager.AddUserClient(user, id.String())
+		if err := g.usermanager.AddUserClient(user, id.String()); err != nil {
+			log.Println(err)
+		}
 	}()
 	return qr, id.String(), nil
 }

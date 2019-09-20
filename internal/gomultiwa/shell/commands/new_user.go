@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"log"
+
 	"github.com/abiosoft/ishell"
 	gmwi "github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
 )
@@ -31,8 +33,12 @@ func GetCmdNewUser(gmw gmwi.GoMultiWAInterface) *ishell.Cmd {
 				c.Println(err)
 				return
 			}
-			um.SetUserPW(id, password)
-			um.SetUserAdmin(id, c.MultiChoice([]string{"no", "yes"}, "admin?") == 1)
+			if err := um.SetUserPW(id, password); err != nil {
+				log.Println(err)
+			}
+			if err := um.SetUserAdmin(id, c.MultiChoice([]string{"no", "yes"}, "admin?") == 1); err != nil {
+				log.Println(err)
+			}
 			c.Println("User created successfully")
 		},
 	}
