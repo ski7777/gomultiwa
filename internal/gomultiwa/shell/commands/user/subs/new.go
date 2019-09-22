@@ -1,4 +1,4 @@
-package commands
+package subs
 
 import (
 	"log"
@@ -7,10 +7,10 @@ import (
 	gmwi "github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
 )
 
-// GetCmdNewUser returns the command to create a new user
-func GetCmdNewUser(gmw gmwi.GoMultiWAInterface) *ishell.Cmd {
+// GetCmdNew returns the command to create a new user
+func GetCmdNew(gmw gmwi.GoMultiWAInterface) *ishell.Cmd {
 	return &ishell.Cmd{
-		Name: "new_user",
+		Name: "new",
 		Help: "Create a new user",
 		Func: func(c *ishell.Context) {
 			c.ShowPrompt(false)
