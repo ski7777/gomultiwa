@@ -37,6 +37,11 @@
         "get-dependencies": {
             "cmd": [
                 {
+                    "type": "rule",
+                    "dedicated": true,
+                    "rule": "install-packr"
+                },
+                {
                     "cmd": "GO111MODULE=on go mod tidy",
                     "type": "cmd"
                 },
@@ -55,6 +60,14 @@
                 "value": "internal"
             }
         },
+        "install-packr": {
+            "cmd": [
+                {
+                    "cmd": "go get -u github.com/gobuffalo/packr/v2/packr2",
+                    "type": "cmd"
+                }
+            ]
+        },
         "prepare-output": {
             "cmd": [
                 {
@@ -67,6 +80,39 @@
                 "type": "directory",
                 "value": "output"
             }
+        },
+        "clean": {
+            "cmd": [
+                {
+                    "cmd": "rm -rf vendor output",
+                    "type": "cmd"
+                }
+            ]
+        },
+        "update-dependencies": {
+            "cmd": [
+                {
+                    "rule": "clean",
+                    "type": "rule",
+                    "dedicated": true
+                },
+                {
+                    "cmd": "GO111MODULE=on go get -u",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "cat go.mod | grep -v \"// indirect\" > go.mod.new",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "mv go.mod.new go.mod",
+                    "type": "cmd"
+                },
+                {
+                    "cmd": "GO111MODULE=on go mod tidy",
+                    "type": "cmd"
+                }
+            ]
         }
     }
 }
