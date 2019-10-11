@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    machine:
+      image: circleci/classic:201808-01
+    steps:
+      - checkout
+      - run:
+          name: "Build"
+          command: |
+            .circleci/prepare.sh
+            export PATH=~/bin/go/go/bin/:$PATH
+            /usr/bin/python3 -m AwesomeBuild
+            cp output/gomultiwa ~/assets/gomultiwa-linux-amd64
+      - store_artifacts:
+          path: ~/assets
+          destination: assets
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
