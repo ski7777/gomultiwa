@@ -33,8 +33,6 @@ type GoMultiWA struct {
 	shell                *shell.Shell
 }
 
-type fn func()
-
 // Start starts all background processes
 func (g *GoMultiWA) Start() {
 	go func() {
@@ -55,15 +53,15 @@ func (g *GoMultiWA) Start() {
 			log.Fatal(err)
 		}
 	}()
-	g.startthread(func() {
+	g.startPeriodicThread(func() {
 		if err := g.SaveConfig(); err != nil {
 			log.Fatal(err)
 		}
-	}, 5*time.Second)
-	g.startthread(func() {
+	}, 5*time.Second, nil)
+	g.startPeriodicThread(func() {
 		g.sessionmanager.Cleanup()
-	}, 5*time.Second)
-	g.startthread(func() {
+	}, 5*time.Second, nil)
+	g.startPeriodicThread(func() {
 		for k := range g.config.Data.WAClients.Clients {
 			if w := g.config.Data.WAClients.Clients[k].WAClient; w != nil {
 				if result, err := w.WA.AdminTest(); !result {
@@ -76,16 +74,23 @@ func (g *GoMultiWA) Start() {
 				}
 			}
 		}
-	}, 5*time.Second)
+	}, 5*time.Second, func() {
+		for _, v := range g.config.Data.WAClients.Clients {
+			v.Disconnect()
+		}
+	})
 	go g.shell.Start()
 }
 
-func (g *GoMultiWA) startthread(f fn, wait time.Duration) {
+func (g *GoMultiWA) startPeriodicThread(f func(), wait time.Duration, s func()) {
 	g.threadwait.Add(1)
 	go func() {
 		for !g.stopthreads {
 			f()
 			time.Sleep(wait)
+		}
+		if s != nil {
+			s()
 		}
 		g.threadwait.Done()
 	}()
