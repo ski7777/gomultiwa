@@ -50,6 +50,13 @@ func (w *Config) Connect() error {
 	return nil
 }
 
+// Disconnect disconnects the WAClient if connected
+func (w *Config) Disconnect() {
+	if w.WAClient != nil {
+		w.WAClient.WA.Disconnect()
+	}
+}
+
 func newJSONSession(s *wa.Session) *JSONSession {
 	return &JSONSession{s.ClientId, s.ClientToken, s.ServerToken, s.EncKey, s.MacKey, s.Wid}
 }
