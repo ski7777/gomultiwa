@@ -18,3 +18,4 @@ awesomestatus.json
 AwesomeStats.pdf
 gomultiwa.json
 *-packr.go
+internal/extensions/extensionloader.go
