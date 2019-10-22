@@ -16,12 +16,13 @@ type Extension struct { // implements "github.com/ski7777/gomsgqueue/pkg/interfa
 	um  *usermanager.UserManager
 	mq  *messagequeue.MessageQueue
 	mqm *messagequeue.Master
+	mqe *messagequeue.Extension
 }
 
 func (e *Extension) ConnectEmbedded(f func(*messagequeue.MessageQueue) interfaces.Extension) {
-	mqe := messagequeue.NewExtension()
-	mqe.ConnectToMaster(e.mqm)
-	e.ext = f(mqe.GetMessageQueue())
+	e.mqe = messagequeue.NewExtension()
+	e.mqe.ConnectToMaster(e.mqm)
+	e.ext = f(e.mqe.GetMessageQueue())
 }
 
 func (e *Extension) ConnectDedicated(cmd string) error {
@@ -35,6 +36,9 @@ func (e *Extension) ConnectDedicated(cmd string) error {
 
 func (e *Extension) start() {
 	e.mq.Run()
+	if e.mqe != nil {
+		e.mqe.Run()
+	}
 }
 
 func (e *Extension) stop() {
