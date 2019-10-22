@@ -24,12 +24,7 @@ func (sm *ScopeManager) SetRequestHandler(f func()) {
 func (sm *ScopeManager) InScopes(s *pkg.Scope) bool {
 	sm.scopeslock.Lock()
 	defer sm.scopeslock.Unlock()
-	for _, v := range *sm.scopes {
-		if v.EqualsTo(s) {
-			return true
-		}
-	}
-	return false
+	return sm.inScopes(s)
 }
 
 func (sm *ScopeManager) ApproveScope(s *pkg.Scope) error {
@@ -88,9 +83,18 @@ func (sm *ScopeManager) GetScopeApproved(s *pkg.Scope) (bool, error) {
 	return false, errors.New("Scope not found")
 }
 
+func (sm *ScopeManager) inScopes(s *pkg.Scope) bool {
+	for _, v := range *sm.scopes {
+		if v.EqualsTo(s) {
+			return true
+		}
+	}
+	return false
+}
+
 func (sm *ScopeManager) handleRequestSingle(_ string, _ string, pl interface{}, _ bool) {
 	s := pl.(*pkg.Scope)
-	if !sm.InScopes(s) {
+	if !sm.inScopes(s) {
 		sm.scopeslock.Lock()
 		defer sm.scopeslock.Unlock()
 		*sm.scopes = append(*sm.scopes, s)
@@ -104,7 +108,7 @@ func (sm *ScopeManager) handleRequestMultiple(_ string, _ string, pl interface{}
 	defer sm.scopeslock.Unlock()
 	for _, si := range sl {
 		s := si.(*pkg.Scope)
-		if !sm.InScopes(s) {
+		if !sm.inScopes(s) {
 			*sm.scopes = append(*sm.scopes, s)
 		}
 	}

@@ -22,18 +22,13 @@ func (sm *ScopeManager) SetApproveHandler(f func()) {
 func (sm *ScopeManager) InScopes(s *Scope) bool {
 	sm.scopeslock.Lock()
 	defer sm.scopeslock.Unlock()
-	for _, v := range *sm.scopes {
-		if v.EqualsTo(s) {
-			return true
-		}
-	}
-	return false
+	return sm.inScopes(s)
 }
 
 func (sm *ScopeManager) RequestScope(s *Scope) {
 	sm.scopeslock.Lock()
 	defer sm.scopeslock.Unlock()
-	if !sm.InScopes(s) {
+	if !sm.inScopes(s) {
 		*sm.scopes = append(*sm.scopes, s)
 		go sm.requestScope(s)
 	}
@@ -44,7 +39,7 @@ func (sm *ScopeManager) RequestScopes(s []*Scope) {
 	defer sm.scopeslock.Unlock()
 	rs := new([]*Scope)
 	for _, ss := range s {
-		if !sm.InScopes(ss) {
+		if !sm.inScopes(ss) {
 			*sm.scopes = append(*sm.scopes, ss)
 			*rs = append(*rs, ss)
 		}
@@ -67,6 +62,15 @@ func (sm *ScopeManager) GetScopeApproved(s *Scope) (bool, error) {
 		}
 	}
 	return false, errors.New("Scope not found")
+}
+
+func (sm *ScopeManager) inScopes(s *Scope) bool {
+	for _, v := range *sm.scopes {
+		if v.EqualsTo(s) {
+			return true
+		}
+	}
+	return false
 }
 
 func (sm *ScopeManager) handleApproveSingle(_ string, _ string, pl interface{}, _ bool) {

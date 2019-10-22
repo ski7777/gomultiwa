@@ -69,6 +69,7 @@ func (em *ExtensionManager) addExtension(e *Extension) {
 
 func NewExtensionManager(ws *websocketserver.WSServer, um *usermanager.UserManager) *ExtensionManager {
 	em := new(ExtensionManager)
+	em.extensions = make(map[string]*Extension)
 	em.loadExtensions()
 	return em
 }
