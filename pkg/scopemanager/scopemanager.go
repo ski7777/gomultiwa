@@ -2,6 +2,7 @@ package scopemanager
 
 import (
 	"errors"
+	"log"
 	"sync"
 
 	"github.com/ski7777/gomsgqueue/pkg/messagequeue"
@@ -96,11 +97,15 @@ func (sm *ScopeManager) handleApproveMultiple(_ string, _ string, pl interface{}
 }
 
 func (sm *ScopeManager) requestScope(s *Scope) {
-	sm.mq.SendMessage(s, MsgScopeManagerRequestScopeSingle)
+	if _, e := sm.mq.SendMessage(s, MsgScopeManagerRequestScopeSingle); e != nil {
+		log.Fatal(e)
+	}
 }
 
 func (sm *ScopeManager) requestScopes(s *[]*Scope) {
-	sm.mq.SendMessage(s, MsgScopeManagerRequestScopeMultiple)
+	if _, e := sm.mq.SendMessage(s, MsgScopeManagerRequestScopeMultiple); e != nil {
+		log.Fatal(e)
+	}
 }
 
 func (sm *ScopeManager) callApproveHandler() {

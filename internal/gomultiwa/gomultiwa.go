@@ -103,8 +103,8 @@ func (g *GoMultiWA) startPeriodicThread(f func(), wait time.Duration, s func()) 
 func (g *GoMultiWA) Stop() {
 	log.Println("Stopping all threads...")
 	g.stopthreads = true
+	g.threadwait.Add(1)
 	go func() {
-		g.threadwait.Add(1)
 		g.extensionmanager.Stop()
 		g.threadwait.Done()
 	}()

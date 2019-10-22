@@ -2,6 +2,7 @@ package scopemanager
 
 import (
 	"errors"
+	"log"
 	"strconv"
 	"sync"
 
@@ -93,7 +94,7 @@ func (sm *ScopeManager) handleRequestSingle(_ string, _ string, pl interface{}, 
 		sm.scopeslock.Lock()
 		defer sm.scopeslock.Unlock()
 		*sm.scopes = append(*sm.scopes, s)
-		go sm.requesthandler()
+		go sm.callRequestHandler()
 	}
 }
 
@@ -111,11 +112,15 @@ func (sm *ScopeManager) handleRequestMultiple(_ string, _ string, pl interface{}
 }
 
 func (sm *ScopeManager) approveScope(s *pkg.Scope) {
-	sm.mq.SendMessage(s, pkg.MsgScopeManagerApproveScopeSingle)
+	if _, e := sm.mq.SendMessage(s, pkg.MsgScopeManagerApproveScopeSingle); e != nil {
+		log.Fatal(e)
+	}
 }
 
 func (sm *ScopeManager) approveScopes(s *[]*pkg.Scope) {
-	sm.mq.SendMessage(s, pkg.MsgScopeManagerApproveScopeMultiple)
+	if _, e := sm.mq.SendMessage(s, pkg.MsgScopeManagerApproveScopeMultiple); e != nil {
+		log.Fatal(e)
+	}
 }
 
 func (sm *ScopeManager) callRequestHandler() {

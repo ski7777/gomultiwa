@@ -53,7 +53,7 @@ func (w *Config) Connect() error {
 // Disconnect disconnects the WAClient if connected
 func (w *Config) Disconnect() {
 	if w.WAClient != nil {
-		w.WAClient.WA.Disconnect()
+		_, _ = w.WAClient.WA.Disconnect()
 	}
 }
 

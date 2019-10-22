@@ -31,9 +31,9 @@ func (em *ExtensionManager) Stop() {
 	wait := new(sync.WaitGroup)
 	em.extensionslock.Lock()
 	defer em.extensionslock.Unlock()
+	wait.Add(len(em.extensions))
 	for ei := range em.extensions {
 		go func(e *Extension) {
-			wait.Add(1)
 			e.stop()
 			wait.Done()
 		}(em.extensions[ei])
@@ -69,5 +69,6 @@ func (em *ExtensionManager) addExtension(e *Extension) {
 
 func NewExtensionManager(ws *websocketserver.WSServer, um *usermanager.UserManager) *ExtensionManager {
 	em := new(ExtensionManager)
+	em.loadExtensions()
 	return em
 }
