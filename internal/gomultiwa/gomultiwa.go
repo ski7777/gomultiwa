@@ -10,6 +10,7 @@ import (
 	wa "github.com/Rhymen/go-whatsapp"
 	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/config"
+	"github.com/ski7777/gomultiwa/internal/extensions"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
 	"github.com/ski7777/gomultiwa/internal/sessionmanager"
@@ -31,6 +32,7 @@ type GoMultiWA struct {
 	sessionmanager       *sessionmanager.SessionManager
 	threadwait           sync.WaitGroup
 	shell                *shell.Shell
+	extensionmanager     *extensions.ExtensionManager
 }
 
 // Start starts all background processes
@@ -80,6 +82,7 @@ func (g *GoMultiWA) Start() {
 		}
 	})
 	go g.shell.Start()
+	go g.extensionmanager.Start()
 }
 
 func (g *GoMultiWA) startPeriodicThread(f func(), wait time.Duration, s func()) {
@@ -100,6 +103,11 @@ func (g *GoMultiWA) startPeriodicThread(f func(), wait time.Duration, s func()) 
 func (g *GoMultiWA) Stop() {
 	log.Println("Stopping all threads...")
 	g.stopthreads = true
+	go func() {
+		g.threadwait.Add(1)
+		g.extensionmanager.Stop()
+		g.threadwait.Done()
+	}()
 	g.threadwait.Wait()
 	log.Println("All thredas stopped")
 	os.Exit(0)
@@ -194,5 +202,6 @@ func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
 	gmw.wsc.WA = gmw
 	gmw.ws = websocketserver.NewWSServer(gmw.wsc)
 	gmw.shell = shell.NewShell(gmw)
+	gmw.extensionmanager = extensions.NewExtensionManager(gmw.ws, gmw.usermanager)
 	return gmw, nil
 }
