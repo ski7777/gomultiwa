@@ -7,7 +7,7 @@ import (
 )
 
 // RequestLoader loads request (JSON) to struct
-func RequestLoader(w http.ResponseWriter, r *http.Request, v interface{}) error {
+func RequestLoader(r *http.Request, v interface{}) error {
 	bodyb, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return err

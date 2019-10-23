@@ -14,7 +14,7 @@ import (
 func RegisterClient(wa gmwi.GoMultiWAInterface) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := new(structs.RegisterClientReq)
-		if err := util.RequestLoader(w, r, req); err != nil {
+		if err := util.RequestLoader(r, req); err != nil {
 			util.ResponseWriter(w, 400, err, nil, nil, "")
 			return
 		}
