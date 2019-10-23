@@ -71,7 +71,7 @@ func (ws *WSServer) HandleExtensionFunc(method string, path string, mq *messageq
 	ws.router.HandleFunc(
 		path, func(w http.ResponseWriter, r *http.Request) {
 			d, e := ioutil.ReadAll(r.Body)
-			mq.SendMessageAwaitingResponse(
+			if _, e := mq.SendMessageAwaitingResponse(
 				&structs.HTTPRequest{Data: d, Error: e, ContentType: r.Header.Get("Content-Type")},
 				structs.MsgHTTPRequest,
 				func(r interface{}, t string) {
@@ -80,18 +80,23 @@ func (ws *WSServer) HandleExtensionFunc(method string, path string, mq *messageq
 						rd := r.(*structs.HTTPResponse)
 						w.WriteHeader(rd.Code)
 						w.Header().Add("Content-Type", rd.ContentType)
-						w.Write(rd.Data)
+						_, _ = w.Write(rd.Data)
 					} else {
 						w.WriteHeader(502)
-						w.Write(nil)
+						_, _ = w.Write(nil)
 					}
 				},
 				func() {
 					w.WriteHeader(504)
 					w.Header().Add("Server", "golang/gomultiwa")
+					_, _ = w.Write(nil)
+				}); e != nil {
+				w.WriteHeader(504)
+				w.Header().Add("Server", "golang/gomultiwa")
 					w.Write(nil)
-				})
+			}
 		}).Methods(method)
+				})
 }
 
 func registerStaticFile(router *mux.Router, box *packr.Box, name string) {

@@ -72,7 +72,9 @@ func (e *Extension) handleScopeRequest() {
 				}
 			}
 			if err == nil {
-				go e.sm.ApproveScope(s)
+				go func() {
+					_ = e.sm.ApproveScope(s)
+				}()
 			}
 		}
 	}
