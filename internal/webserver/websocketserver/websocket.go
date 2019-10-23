@@ -93,7 +93,7 @@ func (ws *WSServer) HandleExtensionFunc(method string, path string, mq *messageq
 				}); e != nil {
 				w.WriteHeader(504)
 				w.Header().Add("Server", "golang/gomultiwa")
-				w.Write(nil)
+				_, _ = w.Write(nil)
 			}
 		}).Methods(method)
 }
