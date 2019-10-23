@@ -10,19 +10,21 @@ import (
 )
 
 type Extension struct { // implements "github.com/ski7777/gomsgqueue/pkg/interfaces".Master
-	ext interfaces.Extension
-	sm  *sm.ScopeManager
-	ws  *websocketserver.WSServer
-	um  *usermanager.UserManager
-	mq  *messagequeue.MessageQueue
-	mqm *messagequeue.Master
-	mqe *messagequeue.Extension
+	ext      interfaces.Extension
+	sm       *sm.ScopeManager
+	ws       *websocketserver.WSServer
+	um       *usermanager.UserManager
+	mq       *messagequeue.MessageQueue
+	mqm      *messagequeue.Master
+	mqe      *messagequeue.Extension
+	embedded bool
 }
 
 func (e *Extension) ConnectEmbedded(f func(*messagequeue.MessageQueue) interfaces.Extension) {
 	e.mqe = messagequeue.NewExtension()
 	e.mqe.ConnectToMaster(e.mqm)
 	e.ext = f(e.mqe.GetMessageQueue())
+	e.embedded = true
 }
 
 func (e *Extension) ConnectDedicated(cmd string) error {
@@ -36,7 +38,7 @@ func (e *Extension) ConnectDedicated(cmd string) error {
 
 func (e *Extension) start() {
 	e.mq.Run()
-	if e.mqe != nil {
+	if e.embedded {
 		e.mqe.Run()
 	}
 }
