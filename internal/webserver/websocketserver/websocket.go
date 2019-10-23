@@ -2,9 +2,14 @@ package websocketserver
 
 import (
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/ski7777/gomultiwa/pkg/extensions/structs"
+
+	"github.com/ski7777/gomsgqueue/pkg/messagequeue"
 
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gorilla/mux"
@@ -59,6 +64,34 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 // Start stars the server
 func (ws *WSServer) Start() error {
 	return ws.server.ListenAndServe()
+}
+
+func (ws *WSServer) HandleExtensionFunc(method string, path string, mq *messagequeue.MessageQueue) {
+	log.Println("Registering External Route: " + "Path: " + path + " ; Method: " + method)
+	ws.router.HandleFunc(
+		path, func(w http.ResponseWriter, r *http.Request) {
+			d, e := ioutil.ReadAll(r.Body)
+			mq.SendMessageAwaitingResponse(
+				&structs.HTTPRequest{Data: d, Error: e, ContentType: r.Header.Get("Content-Type")},
+				structs.MsgHTTPRequest,
+				func(r interface{}, t string) {
+					w.Header().Add("Server", "golang/gomultiwa")
+					if t == structs.MsgHTTPResponse {
+						rd := r.(*structs.HTTPResponse)
+						w.WriteHeader(rd.Code)
+						w.Header().Add("Content-Type", rd.ContentType)
+						w.Write(rd.Data)
+					} else {
+						w.WriteHeader(502)
+						w.Write(nil)
+					}
+				},
+				func() {
+					w.WriteHeader(504)
+					w.Header().Add("Server", "golang/gomultiwa")
+					w.Write(nil)
+				})
+		}).Methods(method)
 }
 
 func registerStaticFile(router *mux.Router, box *packr.Box, name string) {

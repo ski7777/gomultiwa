@@ -1,6 +1,9 @@
 package extensions
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/ski7777/goextensioniser/pkg/extensioniser"
 	"github.com/ski7777/gomsgqueue/pkg/interfaces"
 	"github.com/ski7777/gomsgqueue/pkg/messagequeue"
@@ -47,7 +50,33 @@ func (e *Extension) stop() {
 	e.mq.Stop()
 }
 
-func (e *Extension) handleScopeRequest() {}
+func (e *Extension) handleScopeRequest() {
+	sl := e.sm.GetScopes()
+	for _, s := range sl {
+		if !s.Approved {
+			var approve bool
+			if e.embedded {
+				approve = true
+			} else {
+				// Some more magic needed
+			}
+			var err error
+			if approve {
+				if s.Name == "http-serve" {
+					d := strings.Split(s.Value, ":")
+					if len(d) == 2 {
+						e.ws.HandleExtensionFunc(d[0], d[1], e.mq)
+					} else {
+						err = errors.New("Invalid Value")
+					}
+				}
+			}
+			if err == nil {
+				go e.sm.ApproveScope(s)
+			}
+		}
+	}
+}
 
 func NewExtension(ws *websocketserver.WSServer, um *usermanager.UserManager) *Extension {
 	e := new(Extension)
