@@ -13,6 +13,7 @@ type ScopeManager struct {
 	scopeslock     sync.Mutex
 	mq             *messagequeue.MessageQueue
 	approvehandler func()
+	handlerlock    sync.Mutex
 }
 
 func (sm *ScopeManager) SetApproveHandler(f func()) {
@@ -113,6 +114,8 @@ func (sm *ScopeManager) requestScopes(s *[]*Scope) {
 }
 
 func (sm *ScopeManager) callApproveHandler() {
+	sm.handlerlock.Lock()
+	defer sm.handlerlock.Unlock()
 	if sm.approvehandler != nil {
 		sm.approvehandler()
 	}

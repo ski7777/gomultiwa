@@ -15,6 +15,7 @@ type ScopeManager struct {
 	scopeslock     sync.Mutex
 	mq             *messagequeue.MessageQueue
 	requesthandler func()
+	handlerlock    sync.Mutex
 }
 
 func (sm *ScopeManager) SetRequestHandler(f func()) {
@@ -128,6 +129,8 @@ func (sm *ScopeManager) approveScopes(s *[]*pkg.Scope) {
 }
 
 func (sm *ScopeManager) callRequestHandler() {
+	sm.handlerlock.Lock()
+	defer sm.handlerlock.Unlock()
 	if sm.requesthandler != nil {
 		sm.requesthandler()
 	}
