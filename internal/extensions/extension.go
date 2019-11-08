@@ -31,7 +31,7 @@ func (e *Extension) ConnectEmbedded(f func(*messagequeue.MessageQueue) interface
 }
 
 func (e *Extension) ConnectDedicated(cmd string) error {
-	cm, err := extensioniser.NewDedicatedExtension("go run $GOPATH/src/github.com/ski7777/gomsgqueue/examples/extension/dedicated/*.go")
+	cm, err := extensioniser.NewDedicatedExtension(cmd)
 	if err != nil {
 		return err
 	}
