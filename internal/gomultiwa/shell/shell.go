@@ -4,6 +4,7 @@ import (
 	"github.com/abiosoft/ishell"
 	gmwi "github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell/commands"
+	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell/commands/client"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell/commands/config"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell/commands/user"
 )
@@ -23,6 +24,7 @@ func NewShell(gmw gmwi.GoMultiWAInterface) *Shell {
 	s.Shell.AddCmd(config.GetCmdConfig(s.gmw))
 	s.Shell.AddCmd(commands.GetCmdExit(s.gmw))
 	s.Shell.AddCmd(user.GetCmdUser(s.gmw))
+	s.Shell.AddCmd(client.GetCmdClient(s.gmw))
 	return s
 }
 
