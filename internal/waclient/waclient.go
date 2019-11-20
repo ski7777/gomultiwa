@@ -2,6 +2,7 @@ package waclient
 
 import (
 	"log"
+	"net/http"
 	"time"
 
 	wa "github.com/Rhymen/go-whatsapp"
@@ -19,13 +20,17 @@ type WAClient struct {
 }
 
 // NewWAClient returns a new WAClient
-func NewWAClient(session *wa.Session) (*WAClient, error) {
+func NewWAClient(c *Config) (*WAClient, error) {
 	gmw := new(WAClient)
-	gmw.WA, _ = wa.NewConn(5 * time.Second)
+	if c.Proxy == nil {
+		gmw.WA, _ = wa.NewConn(5 * time.Second)
+	} else {
+		gmw.WA, _ = wa.NewConnWithProxy(5*time.Second, http.ProxyURL(c.Proxy))
+	}
 	if err := gmw.WA.SetClientName(longclientname, shortclientname); err != nil {
 		log.Println(err)
 	}
-	sess, err := gmw.WA.RestoreWithSession(*session)
+	sess, err := gmw.WA.RestoreWithSession(*c.session)
 	if err != nil {
 		gmw.session = sess
 	}

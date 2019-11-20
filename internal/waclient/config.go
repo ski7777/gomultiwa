@@ -1,6 +1,8 @@
 package waclient
 
 import (
+	"net/url"
+
 	wa "github.com/Rhymen/go-whatsapp"
 )
 
@@ -14,6 +16,7 @@ type Config struct {
 	session  *wa.Session
 	Session  *JSONSession `json:"session"`
 	WAClient *WAClient    `json:"-"`
+	Proxy    *url.URL     `json:"proxy"`
 }
 
 // JSONSession represents a normal wa.Session but JSON serializeable
@@ -43,7 +46,7 @@ func (w *Config) ExportSession() {
 // Connect creates a new WAClient based on session info
 func (w *Config) Connect() error {
 	var err error
-	w.WAClient, err = NewWAClient(w.session)
+	w.WAClient, err = NewWAClient(w)
 	if err != nil {
 		return err
 	}
