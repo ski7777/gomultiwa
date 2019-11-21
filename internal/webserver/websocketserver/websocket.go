@@ -112,7 +112,7 @@ func registerStaticFile(router *mux.Router, box *packr.Box, name string) {
 				log.Println(err)
 			}
 		}
-	})
+	}).Name("/" + name)
 }
 
 func (ws *WSServer) apihandler(call string) func(http.ResponseWriter, *http.Request) {
