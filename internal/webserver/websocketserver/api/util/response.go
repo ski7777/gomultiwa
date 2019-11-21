@@ -28,6 +28,9 @@ func ResponseWriter(w http.ResponseWriter, code int, err error, payload interfac
 		contenttype = rawcontenttype
 	}
 	w.Header().Add("Server", "golang/gomultiwa")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	w.WriteHeader(code)
 	if payload == nil && rawpayload == nil {
 		return

@@ -49,6 +49,9 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	s.router.HandleFunc("/api/v1/registerclient", s.apihandler("registerclient")).Methods("POST")
 	s.router.HandleFunc("/api/v1/login", s.apihandler("login")).Methods("POST")
 	s.router.HandleFunc("/api/v1/clients", s.apihandler("clients")).Methods("POST")
+	s.router.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		util.ResponseWriter(w, 200, nil, nil, nil, "")
+	})
 	s.router.NotFoundHandler = s.router.NewRoute().HandlerFunc(notfound).GetHandler()
 	s.server = &http.Server{
 		Addr:         config.GetAddr(),
