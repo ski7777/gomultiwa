@@ -12,6 +12,7 @@ import (
 	"github.com/ski7777/gomsgqueue/pkg/messagequeue"
 
 	"github.com/gobuffalo/packr/v2"
+	"github.com/gobuffalo/packr/v2/file"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	gmwi "github.com/ski7777/gomultiwa/internal/gomultiwa/interface"
@@ -38,13 +39,12 @@ func NewWSServer(config *WSServerConfig) *WSServer {
 	s := new(WSServer)
 	s.wa = config.WA
 	s.router = mux.NewRouter()
-	//_, filename, _, _ := runtime.Caller(0)
-	//webdir := path.Join(path.Dir(filename), "../../../web")
-	webbox := packr.New("web", "../../../web")
-	//staticdir := path.Join(webdir, "static")
-	staticbox := packr.New("web/static", "../../../web/static")
-	registerStaticFile(s.router, webbox, "index.html")
-	s.router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(staticbox)))
+	webbox := packr.New("web", "../../../ui/dist")
+	webbox.Walk(func(path string, _ file.File) error {
+		registerStaticFile(s.router, webbox, path)
+		return nil
+	})
+	s.router.HandleFunc("/", s.router.GetRoute("/index.html").GetHandler().ServeHTTP).Methods("GET")
 	s.router.HandleFunc("/api/v1/sendmsg", s.apihandler("sendmsg")).Methods("POST")
 	s.router.HandleFunc("/api/v1/registerclient", s.apihandler("registerclient")).Methods("POST")
 	s.router.HandleFunc("/api/v1/login", s.apihandler("login")).Methods("POST")
