@@ -1,0 +1,36 @@
+{
+  "name": "gomultiwa",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "core-js": "^3",
+    "js-yaml": "3.13.1",
+    "register-service-worker": "^1.6.2",
+    "vue": "^2.6.10",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@vue/cli": "^4.0.5",
+    "@vue/cli-plugin-babel": "^4.0.5",
+    "@vue/cli-plugin-pwa": "^4.0.5",
+    "@vue/cli-plugin-unit-jest": "^4.0.5",
+    "@vue/cli-plugin-vuex": "^4.0.5",
+    "@vue/cli-service": "^4.0.5",
+    "@vue/test-utils": "1.0.0-beta.29",
+    "browserify": "^16.5.0",
+    "css-loader": "^3.2.0",
+    "envify": "^4.1.0",
+    "npm": "^6.13.1",
+    "uglify-js": "^3.6.9",
+    "vue-loader": "^15.7.2",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.6.10",
+    "vueify": "^9.4.1"
+  }
+}
