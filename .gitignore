@@ -16,6 +16,6 @@ vendor/
 output
 awesomestatus.json
 AwesomeStats.pdf
-gomultiwa.json
+gomultiwa*.json
 *-packr.go
 internal/extensions/extensionloader.go

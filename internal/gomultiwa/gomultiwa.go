@@ -10,6 +10,7 @@ import (
 	wa "github.com/Rhymen/go-whatsapp"
 	"github.com/google/uuid"
 	"github.com/ski7777/gomultiwa/internal/config"
+	"github.com/ski7777/gomultiwa/internal/debug"
 	"github.com/ski7777/gomultiwa/internal/extensions"
 	"github.com/ski7777/gomultiwa/internal/gomultiwa/shell"
 	"github.com/ski7777/gomultiwa/internal/handlerhub"
@@ -33,56 +34,72 @@ type GoMultiWA struct {
 	threadwait           sync.WaitGroup
 	shell                *shell.Shell
 	extensionmanager     *extensions.ExtensionManager
+	debug                *debug.Debug
 }
 
 // Start starts all background processes
 func (g *GoMultiWA) Start() {
-	go func() {
-		for k := range g.config.Data.WAClients.Clients {
-			handler := new(waclient.WAHandler)
-			handler.SetID(k)
-			if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
-				log.Println(err)
+	startdebug := g.debug.GetSubDefault("feature_startup")
+	if startdebug.GetBoolDefault("client", true) {
+		go func() {
+			for k := range g.config.Data.WAClients.Clients {
+				handler := new(waclient.WAHandler)
+				handler.SetID(k)
+				if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
+					log.Println(err)
+				}
+				g.config.Data.WAClients.Clients[k].WAClient.WA.AddHandler(handler)
 			}
-			g.config.Data.WAClients.Clients[k].WAClient.WA.AddHandler(handler)
-		}
-		if err := g.config.Save(); err != nil {
-			log.Fatal(err)
-		}
-	}()
-	go func() {
-		if err := g.ws.Start(); err != nil {
-			log.Fatal(err)
-		}
-	}()
-	g.startPeriodicThread(func() {
-		if err := g.SaveConfig(); err != nil {
-			log.Fatal(err)
-		}
-	}, 5*time.Second, nil)
-	g.startPeriodicThread(func() {
-		g.sessionmanager.Cleanup()
-	}, 5*time.Second, nil)
-	g.startPeriodicThread(func() {
-		for k := range g.config.Data.WAClients.Clients {
-			if w := g.config.Data.WAClients.Clients[k].WAClient; w != nil {
-				if result, err := w.WA.AdminTest(); !result {
-					if err == wa.ErrNotConnected {
-						log.Println("Reconnecting " + k + "(" + g.config.Data.WAClients.Clients[k].Session.Wid + ")")
-						if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
-							log.Println(err)
+			if err := g.config.Save(); err != nil {
+				log.Fatal(err)
+			}
+		}()
+	}
+	if startdebug.GetBoolDefault("wss", true) {
+		go func() {
+			if err := g.ws.Start(); err != nil {
+				log.Fatal(err)
+			}
+		}()
+	}
+	if startdebug.GetBoolDefault("save_config", true) {
+		g.startPeriodicThread(func() {
+			if err := g.SaveConfig(); err != nil {
+				log.Fatal(err)
+			}
+		}, 5*time.Second, nil)
+	}
+	if startdebug.GetBoolDefault("session_cleaner", true) {
+		g.startPeriodicThread(func() {
+			g.sessionmanager.Cleanup()
+		}, 5*time.Second, nil)
+	}
+	if startdebug.GetBoolDefault("client", true) && startdebug.GetBoolDefault("client_reconnect", true) {
+		g.startPeriodicThread(func() {
+			for k := range g.config.Data.WAClients.Clients {
+				if w := g.config.Data.WAClients.Clients[k].WAClient; w != nil {
+					if result, err := w.WA.AdminTest(); !result {
+						if err == wa.ErrNotConnected {
+							log.Println("Reconnecting " + k + "(" + g.config.Data.WAClients.Clients[k].Session.Wid + ")")
+							if err := g.config.Data.WAClients.Clients[k].Connect(); err != nil {
+								log.Println(err)
+							}
 						}
 					}
 				}
 			}
-		}
-	}, 5*time.Second, func() {
-		for _, v := range g.config.Data.WAClients.Clients {
-			v.Disconnect()
-		}
-	})
-	go g.shell.Start()
-	go g.extensionmanager.Start()
+		}, 5*time.Second, func() {
+			for _, v := range g.config.Data.WAClients.Clients {
+				v.Disconnect()
+			}
+		})
+	}
+	if startdebug.GetBoolDefault("shell", true) {
+		go g.shell.Start()
+	}
+	if startdebug.GetBoolDefault("extensions", true) {
+		go g.extensionmanager.Start()
+	}
 }
 
 func (g *GoMultiWA) startPeriodicThread(f func(), wait time.Duration, s func()) {
@@ -185,10 +202,14 @@ func (g *GoMultiWA) GetUserManager() *usermanager.UserManager {
 }
 
 // NewGoMultiWA returns a new GoMultiWA struct
-func NewGoMultiWA(configpath string) (*GoMultiWA, error) {
+func NewGoMultiWA(gmwc Config) (*GoMultiWA, error) {
 	gmw := new(GoMultiWA)
 	var err error
-	gmw.config, err = config.NewConfig(configpath)
+	gmw.debug, err = debug.NewDebug(*gmwc.DebugConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	gmw.config, err = config.NewConfig(*gmwc.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
